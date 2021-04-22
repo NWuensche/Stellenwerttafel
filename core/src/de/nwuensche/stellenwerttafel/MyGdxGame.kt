@@ -18,7 +18,8 @@ class MyGdxGame : ApplicationAdapter() {
                 .apply { color = Constants.lineColor }
                 .apply { projectionMatrix = camera.combined }
     }
-    val world: World by lazy { World(Vector2(0f, 0f), true) } //First is gravity vector, second is CPU optimization on
+    //TODO Setting doSleep=false makes movement of other circles while dragging better
+    val world: World by lazy { World(Vector2(0f, 0f), false) } //First is gravity vector, second is CPU optimization on
     val board: Board by lazy { Board(sR, world) }
     val debugRenderer: Box2DDebugRenderer by lazy { Box2DDebugRenderer() } //TODO Use real renderer
 
@@ -40,51 +41,7 @@ class MyGdxGame : ApplicationAdapter() {
             }
         }
 
-        createBordersBox2D()
-
-        val bodyDef = BodyDef()
-// We set our body to dynamic, for something like ground which doesn't move we would set it to StaticBody
-// We set our body to dynamic, for something like ground which doesn't move we would set it to StaticBody
-        bodyDef.type = BodyDef.BodyType.DynamicBody
-// Set our body's starting position in the world
-// Set our body's starting position in the world
-        bodyDef.position.set(100f, 300f)
-
-// Create our body in the world using our body definition
-
-// Create our body in the world using our body definition
-        val body: Body = world.createBody(bodyDef)
-
-        bodyDef.position.set(101f, 300f)
-        val body2: Body = world.createBody(bodyDef)
-
-        bodyDef.position.set(100f, 295f)
-        val body3: Body = world.createBody(bodyDef)
-
-
-// Create a circle shape and set its radius to 6
-
-// Create a circle shape and set its radius to 6
-        val circle = CircleShape()
-        circle.radius = 50f
-
-// Create a fixture definition to apply our shape to
-
-// Create a fixture definition to apply our shape to
-        val fixtureDef = FixtureDef()
-        fixtureDef.shape = circle
-        fixtureDef.density = 0.2f
-        fixtureDef.friction = 0.1f
-        fixtureDef.restitution = 0.6f // Make it bounce a little bit
-
-
-// Create our fixture and attach it to the body
-
-// Create our fixture and attach it to the body
-        val fixture: Fixture = body.createFixture(fixtureDef)
-        val fixture2: Fixture = body2.createFixture(fixtureDef)
-        val fixture3: Fixture = body3.createFixture(fixtureDef)
-
+        createBordersBox2D() // Should be after drawing all graphics, else could get out of sync
     }
 
     private fun createBordersBox2D() {
@@ -130,7 +87,7 @@ class MyGdxGame : ApplicationAdapter() {
         ScreenUtils.clear(1f, 1f, 1f, 1f) //White Background
         board.draw()
         doPhysicsStep(Gdx.graphics.deltaTime)
-        debugRenderer.render(world, camera.combined) //INFO Should always be done !after! drawing graphics
+        //debugRenderer.render(world, camera.combined) //INFO Should always be done !after! drawing graphics
     }
 
     private var accumulator = 0f

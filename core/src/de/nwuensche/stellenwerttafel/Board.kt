@@ -6,7 +6,7 @@ import com.badlogic.gdx.physics.box2d.*
 
 typealias Circle = Vector2
 class Board(val sR: ShapeRenderer, val world: World): Drawable {
-    val circles = arrayListOf<Circle>()
+    val circles = arrayListOf<Fixture>()
 
     private enum class DragState {
         NONE, //Not in dragged state
@@ -14,7 +14,7 @@ class Board(val sR: ShapeRenderer, val world: World): Drawable {
         DRAGNOTHING // dragged, but first touch on nothing
     }
     private var dragState = DragState.NONE
-    var draggedCircle: Circle? = null
+    var draggedCircle: Fixture? = null
 
 
     override fun draw() {
@@ -42,6 +42,7 @@ class Board(val sR: ShapeRenderer, val world: World): Drawable {
             circleDef.position.set(screenX.toFloat() * Constants.convertRatio, screenY.toFloat() * Constants.convertRatio)
             val body: Body = world.createBody(circleDef)
             val fixture = body.createFixture(fixtureDef) //TODO dispose fixture when circle merged or deleted
+            circles.add(fixture)
         }
 
         //reset
@@ -50,18 +51,19 @@ class Board(val sR: ShapeRenderer, val world: World): Drawable {
     }
 
     fun touchDragged(screenX: Int, screenY: Int, pointer: Int) {
+        val screenXNormalized = screenX * Constants.convertRatio
+        val screenYNormalized = screenY * Constants.convertRatio
+
         if (draggedCircle != null) {
-            draggedCircle?.x = screenX.toFloat()
-            draggedCircle?.y = screenY.toFloat()
+            draggedCircle?.body?.setTransform(screenXNormalized, screenYNormalized, 0f)
             return
         }
-
-        //Start with 'highest' circle (thus reverse list), find highest circle which is below touch event
+        
         for (circle in circles.asReversed()) { //TODO Might be slow, because really reverse list
-            if (((circle.x - Constants.radius) <= screenX)
-                    && (screenX <= (circle.x + Constants.radius))
-                    && ((circle.y - Constants.radius) <= screenY)
-                    && (screenY <= (circle.y + Constants.radius))) {
+            if (((circle.body.position.x - Constants.radius) <= screenXNormalized)
+                    && (screenXNormalized <= (circle.body.position.x + Constants.radius))
+                    && ((circle.body.position.y - Constants.radius) <= screenYNormalized)
+                    && (screenYNormalized <= (circle.body.position.y + Constants.radius))) {
                 draggedCircle = circle
                 break
             }
@@ -76,11 +78,12 @@ fun ShapeRenderer.drawLine(v1: Vector2, v2: Vector2) {
     this.end()
 }
 
-fun ShapeRenderer.drawCircle(m: Circle) {
+fun ShapeRenderer.drawCircle(c: Fixture) {
+    val pos = c.body.position
     this.begin(ShapeRenderer.ShapeType.Filled)
-    this.circle(m.x,m.y,Constants.radius)
+    this.circle(pos.x,pos.y,Constants.radius,100) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
     this.color = Constants.circleRedColor
-    this.circle(m.x,m.y,Constants.radius - Constants.lineWidth)
+    this.circle(pos.x,pos.y,Constants.radius - Constants.lineWidth, 100) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
     this.color = Constants.lineColor
     this.end() //TODO I should only open shaperenderer once, because explensive: https://stackoverflow.com/questions/29035553/trying-to-draw-a-circle-in-libgdx
 }
