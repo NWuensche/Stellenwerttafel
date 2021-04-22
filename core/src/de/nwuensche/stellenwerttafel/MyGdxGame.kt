@@ -3,10 +3,11 @@ package de.nwuensche.stellenwerttafel
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.utils.ScreenUtils
+
+
 
 class MyGdxGame : ApplicationAdapter() {
     val sR: ShapeRenderer by lazy { // Used for drawing lines,circles,...
@@ -19,13 +20,21 @@ class MyGdxGame : ApplicationAdapter() {
     }
     val board: Board by lazy { Board(sR) }
 
+
+
     override fun create() {
         Gdx.gl.glLineWidth(Constants.lineWidth)
 
         Gdx.input.inputProcessor = object : InputAdapter() {
-            override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+            override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
                 //TODO Interssting if (img.getBoundingRectangle().contains(screenX, screenY)) println("Image Clicked")
-                board.touchDown(screenX, screenY, pointer, button)
+                board.touchUp(screenX, screenY, pointer, button) //TODO Alex ist das touchUp oder touchDown?
+                //TODO Alex Touch Drag auf nichts erstellt am Ende auch Button oder nicht?
+                return true
+            }
+
+            override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+                board.touchDragged(screenX, screenY, pointer) //TODO Alex ist das touchUp oder touchDown?
                 return true
             }
         }
