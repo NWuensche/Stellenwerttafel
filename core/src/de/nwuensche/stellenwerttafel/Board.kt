@@ -10,7 +10,7 @@ class Board(val sR: ShapeRenderer): Drawable {
 
     //Cache
     val firstLineWidth = Constants.width / 3f
-    val secondLineWidth = (2f / 3f) * Constants.width
+    val secondLineWidth = (2 / 3f) * Constants.width
 
     private enum class DragState {
         NONE, //Not in dragged state

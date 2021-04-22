@@ -8,6 +8,7 @@ object Constants {
     val height = Gdx.graphics.height.toFloat()
     val lineWidth = 10f
     val radius = 50f
+    val timeStep = 1/60f
 
     val lineColor = Color.BLACK
     val circleRedColor = Color.RED
