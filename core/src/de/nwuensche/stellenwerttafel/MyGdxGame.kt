@@ -24,7 +24,7 @@ class MyGdxGame : ApplicationAdapter() {
 
 
     override fun create() {
-        Gdx.gl.glLineWidth(Constants.lineWidth)
+        Gdx.gl.glLineWidth(Constants.lineWidthOriginal)
 
         Gdx.input.inputProcessor = object : InputAdapter() {
             override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -92,26 +92,38 @@ class MyGdxGame : ApplicationAdapter() {
         borderDef.position.set(Vector2(0f, Constants.height))
         val groundBody = world.createBody(borderDef)
         val groundBox = PolygonShape()
-        groundBox.setAsBox(Constants.width, Constants.lineWidthNormalized) //INFO Takes half values as inputs, but I want margin around drawn lines, so 'normal' is ok
+        groundBox.setAsBox(Constants.width, Constants.lineWidth) //INFO Takes half values as inputs, but I want margin around drawn lines, so 'normal' is ok
         groundBody.createFixture(groundBox, 0.0f)
 
         borderDef.position.set(Vector2(0f, 0f))
         val ceilBody = world.createBody(borderDef)
         val ceilBox = PolygonShape()
-        ceilBox.setAsBox(Constants.width, Constants.lineWidthNormalized)
+        ceilBox.setAsBox(Constants.width, Constants.lineWidth)
         ceilBody.createFixture(ceilBox, 0.0f)
 
         borderDef.position.set(Vector2(0f, 0f))
         val leftBody = world.createBody(borderDef)
         val leftBox = PolygonShape()
-        leftBox.setAsBox(Constants.lineWidthNormalized, Constants.height)
+        leftBox.setAsBox(Constants.lineWidth, Constants.height)
         leftBody.createFixture(leftBox, 0.0f)
 
         borderDef.position.set(Vector2(Constants.width, 0f))
         val rightBody = world.createBody(borderDef)
         val rightBox = PolygonShape()
-        rightBox.setAsBox(Constants.lineWidthNormalized, Constants.height)
+        rightBox.setAsBox(Constants.lineWidth, Constants.height)
         rightBody.createFixture(rightBox, 0.0f)
+
+        borderDef.position.set(Vector2(Constants.firstLineBorderWidth, 0f))
+        val firstLineBorderBody = world.createBody(borderDef)
+        val firstLineBorderBox = PolygonShape()
+        firstLineBorderBox.setAsBox(Constants.lineWidth, Constants.height)
+        firstLineBorderBody.createFixture(firstLineBorderBox, 0.0f)
+
+        borderDef.position.set(Vector2(Constants.secondLineBorderWidth, 0f))
+        val secondLineBorderBody = world.createBody(borderDef)
+        val secondLineBorderBox = PolygonShape()
+        secondLineBorderBox.setAsBox(Constants.lineWidth, Constants.height)
+        secondLineBorderBody.createFixture(secondLineBorderBox, 0.0f)
     }
 
     override fun render() {

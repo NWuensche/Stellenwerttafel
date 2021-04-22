@@ -8,10 +8,6 @@ typealias Circle = Vector2
 class Board(val sR: ShapeRenderer, val world: World): Drawable {
     val circles = arrayListOf<Circle>()
 
-    //Cache
-    val firstLineWidth = Constants.width / 3f
-    val secondLineWidth = (2 / 3f) * Constants.width
-
     private enum class DragState {
         NONE, //Not in dragged state
         DRAGCIRCLE, // dragged, and first touch on a circle
@@ -22,8 +18,8 @@ class Board(val sR: ShapeRenderer, val world: World): Drawable {
 
 
     override fun draw() {
-        sR.drawLine(Vector2(firstLineWidth, 0f), Vector2(firstLineWidth, Constants.height))
-        sR.drawLine(Vector2(secondLineWidth, 0f), Vector2(secondLineWidth, Constants.height))
+        sR.drawLine(Vector2(Constants.firstLineBorderWidth, 0f), Vector2(Constants.firstLineBorderWidth, Constants.height))
+        sR.drawLine(Vector2(Constants.secondLineBorderWidth, 0f), Vector2(Constants.secondLineBorderWidth, Constants.height))
 
         for (circle in circles) {
             sR.drawCircle(circle)
@@ -84,7 +80,7 @@ fun ShapeRenderer.drawCircle(m: Circle) {
     this.begin(ShapeRenderer.ShapeType.Filled)
     this.circle(m.x,m.y,Constants.radius)
     this.color = Constants.circleRedColor
-    this.circle(m.x,m.y,Constants.radius - Constants.lineWidthNormalized)
+    this.circle(m.x,m.y,Constants.radius - Constants.lineWidth)
     this.color = Constants.lineColor
     this.end() //TODO I should only open shaperenderer once, because explensive: https://stackoverflow.com/questions/29035553/trying-to-draw-a-circle-in-libgdx
 }

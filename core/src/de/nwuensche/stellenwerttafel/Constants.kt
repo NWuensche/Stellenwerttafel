@@ -8,9 +8,13 @@ object Constants {
     val height = Gdx.graphics.height.toFloat() / Gdx.graphics.width
     val convertRatio = 1f/Gdx.graphics.width
 
+    //2 borders for board
+    val firstLineBorderWidth = width / 3f
+    val secondLineBorderWidth = (2 / 3f) * width
+
     //TODO Relative to width/height
-    val lineWidth = 10f
-    val lineWidthNormalized = 10f * convertRatio
+    val lineWidthOriginal = 10f //Only use this to set line width for ShapeRenderer, for everything else use other lineWidth
+    val lineWidth = 10f * convertRatio
     val radius = 50f * convertRatio
 
     val timeStep = 1/60f
