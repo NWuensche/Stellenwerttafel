@@ -1,7 +1,8 @@
 package de.nwuensche.stellenwerttafel
 
-import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 
 interface Drawable {
-    fun draw(batch: Batch)
+    //INFO Problem when batch + ShapeRenderer both are open at the same time (both begin()), use after another
+    fun draw(sR: ShapeRenderer)
 }
