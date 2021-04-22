@@ -11,8 +11,8 @@ import com.badlogic.gdx.utils.ScreenUtils
 
 
 class MyGdxGame : ApplicationAdapter() {
-    val camera by lazy { OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
-                            .apply { setToOrtho(true, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()) }} // INFO Resets origin (0,0) to top left }
+    val camera by lazy { OrthographicCamera(Constants.width, Constants.height)
+                            .apply { setToOrtho(true, Constants.width, Constants.height) }} // INFO Resets origin (0,0) to top left }
     val sR: ShapeRenderer by lazy { // Used for drawing lines,circles,...
         ShapeRenderer()
                 .apply { color = Constants.lineColor }
@@ -92,25 +92,25 @@ class MyGdxGame : ApplicationAdapter() {
         borderDef.position.set(Vector2(0f, Constants.height))
         val groundBody = world.createBody(borderDef)
         val groundBox = PolygonShape()
-        groundBox.setAsBox(Constants.width, Constants.lineWidth) //INFO Takes half values as inputs, but I want margin around drawn lines, so 'normal' is ok
+        groundBox.setAsBox(Constants.width, Constants.lineWidthNormalized) //INFO Takes half values as inputs, but I want margin around drawn lines, so 'normal' is ok
         groundBody.createFixture(groundBox, 0.0f)
 
         borderDef.position.set(Vector2(0f, 0f))
         val ceilBody = world.createBody(borderDef)
         val ceilBox = PolygonShape()
-        ceilBox.setAsBox(Constants.width, Constants.lineWidth)
+        ceilBox.setAsBox(Constants.width, Constants.lineWidthNormalized)
         ceilBody.createFixture(ceilBox, 0.0f)
 
         borderDef.position.set(Vector2(0f, 0f))
         val leftBody = world.createBody(borderDef)
         val leftBox = PolygonShape()
-        leftBox.setAsBox(Constants.lineWidth, Constants.height)
+        leftBox.setAsBox(Constants.lineWidthNormalized, Constants.height)
         leftBody.createFixture(leftBox, 0.0f)
 
         borderDef.position.set(Vector2(Constants.width, 0f))
         val rightBody = world.createBody(borderDef)
         val rightBox = PolygonShape()
-        rightBox.setAsBox(Constants.lineWidth, Constants.height)
+        rightBox.setAsBox(Constants.lineWidthNormalized, Constants.height)
         rightBody.createFixture(rightBox, 0.0f)
     }
 

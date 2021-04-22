@@ -43,7 +43,7 @@ class Board(val sR: ShapeRenderer, val world: World): Drawable {
     fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int) {
         if (dragState != DragState.DRAGCIRCLE) { // As long as not moved circle, create new one
             //TODO IN circles.add(Circle(screenX.toFloat(), screenY.toFloat()))
-            circleDef.position.set(screenX.toFloat(), screenY.toFloat())
+            circleDef.position.set(screenX.toFloat() * Constants.convertRatio, screenY.toFloat() * Constants.convertRatio)
             val body: Body = world.createBody(circleDef)
             val fixture = body.createFixture(fixtureDef) //TODO dispose fixture when circle merged or deleted
         }
@@ -84,7 +84,7 @@ fun ShapeRenderer.drawCircle(m: Circle) {
     this.begin(ShapeRenderer.ShapeType.Filled)
     this.circle(m.x,m.y,Constants.radius)
     this.color = Constants.circleRedColor
-    this.circle(m.x,m.y,Constants.radius - Constants.lineWidth)
+    this.circle(m.x,m.y,Constants.radius - Constants.lineWidthNormalized)
     this.color = Constants.lineColor
     this.end() //TODO I should only open shaperenderer once, because explensive: https://stackoverflow.com/questions/29035553/trying-to-draw-a-circle-in-libgdx
 }
