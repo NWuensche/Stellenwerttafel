@@ -141,7 +141,7 @@ class MyGdxGame : ApplicationAdapter() {
         val frameTime = deltaTime.coerceAtMost(0.25f)
         accumulator += frameTime
         while (accumulator >= Constants.timeStep) {
-            world.step(Constants.timeStep, 6, 10)
+            world.step(Constants.timeStep, 6, 2)
             accumulator -= Constants.timeStep
         }
     }

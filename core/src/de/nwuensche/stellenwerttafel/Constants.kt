@@ -12,8 +12,9 @@ object Constants {
     val firstLineBorderWidth = width / 3f
     val secondLineBorderWidth = (2 / 3f) * width
 
-    //TODO Relative to width/height
+    //TODO Relative to width? Check with emulator + Other smartphones like Alex
     val lineWidthOriginal = 10f //Only use this to set line width for ShapeRenderer, for everything else use other lineWidth
+
     val lineWidth = 10f * convertRatio
     val radius = 50f * convertRatio
 
