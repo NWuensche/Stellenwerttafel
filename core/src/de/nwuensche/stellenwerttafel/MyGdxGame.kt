@@ -18,8 +18,8 @@ class MyGdxGame : ApplicationAdapter() {
                 .apply { color = Constants.lineColor }
                 .apply { projectionMatrix = camera.combined }
     }
-    val board: Board by lazy { Board(sR) }
-    val world: World by lazy { World(Vector2(0f, 10f), true) } //First is gravity vector, second is CPU optimization on
+    val world: World by lazy { World(Vector2(0f, 0f), true) } //First is gravity vector, second is CPU optimization on
+    val board: Board by lazy { Board(sR, world) }
     val debugRenderer: Box2DDebugRenderer by lazy { Box2DDebugRenderer() } //TODO Use real renderer
 
 
@@ -54,8 +54,12 @@ class MyGdxGame : ApplicationAdapter() {
 
 // Create our body in the world using our body definition
         val body: Body = world.createBody(bodyDef)
+
         bodyDef.position.set(101f, 300f)
         val body2: Body = world.createBody(bodyDef)
+
+        bodyDef.position.set(100f, 295f)
+        val body3: Body = world.createBody(bodyDef)
 
 
 // Create a circle shape and set its radius to 6
@@ -79,6 +83,7 @@ class MyGdxGame : ApplicationAdapter() {
 // Create our fixture and attach it to the body
         val fixture: Fixture = body.createFixture(fixtureDef)
         val fixture2: Fixture = body2.createFixture(fixtureDef)
+        val fixture3: Fixture = body3.createFixture(fixtureDef)
 
     }
 
@@ -124,7 +129,7 @@ class MyGdxGame : ApplicationAdapter() {
         val frameTime = deltaTime.coerceAtMost(0.25f)
         accumulator += frameTime
         while (accumulator >= Constants.timeStep) {
-            world.step(Constants.timeStep, 6, 2)
+            world.step(Constants.timeStep, 6, 10)
             accumulator -= Constants.timeStep
         }
     }

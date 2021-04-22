@@ -1,11 +1,11 @@
 package de.nwuensche.stellenwerttafel
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.*
+
 typealias Circle = Vector2
-class Board(val sR: ShapeRenderer): Drawable {
+class Board(val sR: ShapeRenderer, val world: World): Drawable {
     val circles = arrayListOf<Circle>()
 
     //Cache
@@ -30,9 +30,22 @@ class Board(val sR: ShapeRenderer): Drawable {
         }
     }
 
+
+    val circleDef = BodyDef().apply { this.type = BodyDef.BodyType.DynamicBody }
+    val circleShape = CircleShape().apply { this.radius = Constants.radius }
+    val fixtureDef = FixtureDef().apply {
+        this.shape = circleShape
+        this.density = 0.2f
+        this.friction = 0.1f
+        this.restitution = 0.6f
+    }
+
     fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int) {
         if (dragState != DragState.DRAGCIRCLE) { // As long as not moved circle, create new one
-            circles.add(Circle(screenX.toFloat(), screenY.toFloat()))
+            //TODO IN circles.add(Circle(screenX.toFloat(), screenY.toFloat()))
+            circleDef.position.set(screenX.toFloat(), screenY.toFloat())
+            val body: Body = world.createBody(circleDef)
+            val fixture = body.createFixture(fixtureDef) //TODO dispose fixture when circle merged or deleted
         }
 
         //reset
