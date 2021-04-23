@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 
-class Board(val sR: ShapeRenderer, val world: World): Drawable {
+class Board(val sR: ShapeRenderer, val world: World) : Drawable {
     val circles = arrayListOf<Fixture>()
 
     private enum class DragState {
@@ -74,6 +74,8 @@ class Board(val sR: ShapeRenderer, val world: World): Drawable {
                 val numCirclesToRemove = (1/ratio).toInt() - 1 //keep dragged one, so -1
                 val circlesToRemove = circles.getCirclesOfValue(numCirclesToRemove, oldValue)
                 val testCircle = circlesToRemove!![0]
+
+                //TODO Don't want that moving circle collides with anything, so remove its fixture/body first
                 circlesToRemove?.forEach {
                     circles.remove(it)
                     it.destroy() //INFO Needed, else still lag although moved circles from 1 to 100

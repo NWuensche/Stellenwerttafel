@@ -19,6 +19,7 @@ object Constants {
     val radius = 50f * convertRatio
 
     val timeStep = 1/60f
+    val speedFactor = 2 //Move circle in 1/x seconds
 
     val lineColor = Color.BLACK
     val circleRedColor = Color.RED
