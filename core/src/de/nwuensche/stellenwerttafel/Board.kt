@@ -1,5 +1,6 @@
 package de.nwuensche.stellenwerttafel
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
@@ -7,7 +8,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
+import com.badlogic.gdx.utils.I18NBundle
 import com.ibm.icu.text.MessageFormat
+import java.util.*
+
 
 //batch only used for text
 class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val font: BitmapFont) : Drawable {
@@ -17,7 +21,10 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
     var titleTable10Number = 0
     var titleTable1Number = 0
     val glyph = GlyphLayout(font, "")
-
+    val myBundle: I18NBundle by lazy {
+        val baseFileHandle = Gdx.files.internal("i18n/MyBundle")
+        I18NBundle.createBundle(baseFileHandle, Locale.getDefault())
+    }
 
     private enum class DragState {
         NONE, //Not in dragged state
@@ -40,12 +47,12 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         //TODO END also name app English when uploading english version
         batch.begin()
         val sum = Constants.circle100Value*titleTable100Number + Constants.circle10Value*titleTable10Number + Constants.circle1Value*titleTable1Number
-        val sumLocalizedText = MessageFormat.format("{0,spellout}", sum).replace(" ","").replace("\u00AD","").replace("-","").capitalize() //replace '-' and unicode-version of '-' because zweihundert is actually 'zwei-hundert', same holds for ' ' in english
-        font.drawCentered(batch, this.glyph, "$sum = $sumLocalizedText" , 0f, Constants.width, Constants.yTitleTableHead) // TODO Add word
+        val sumLocalizedText = MessageFormat.format("{0,spellout}", sum).replace(" ", "").replace("\u00AD", "").replace("-", "").capitalize() //replace '-' and unicode-version of '-' because zweihundert is actually 'zwei-hundert', same holds for ' ' in english
+        font.drawCentered(batch, this.glyph, "$sum = $sumLocalizedText", 0f, Constants.width, Constants.yTitleTableHead) // TODO Add word
         //TODO Internationalize Hunderter/Zehner/Einer
-        font.drawCentered(batch, this.glyph, "$titleTable100Number Hunderter" , 0f, Constants.firstLineBorderX, Constants.yTitlesTables)
-        font.drawCentered(batch, this.glyph, "$titleTable10Number Zehner" , Constants.firstLineBorderX, Constants.secondLineBorderX, Constants.yTitlesTables)
-        font.drawCentered(batch, this.glyph, "$titleTable1Number Einer" , Constants.secondLineBorderX, Constants.width, Constants.yTitlesTables)
+        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueHundreds", titleTable100Number), 0f, Constants.firstLineBorderX, Constants.yTitlesTables)
+        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueTens", titleTable10Number), Constants.firstLineBorderX, Constants.secondLineBorderX, Constants.yTitlesTables)
+        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueOnes", titleTable1Number), Constants.secondLineBorderX, Constants.width, Constants.yTitlesTables)
 
         batch.end()
 
@@ -156,7 +163,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
  //           (y1 >= Constants.firstLineBorderY) && (y1 <= Constants.firstLineBorderY + Constants.widthCircleAndHitbox) -> Constants.firstLineBorderY + Constants.widthCircleAndHitbox //In y-hitbox, but closer to header TODO Remove Circle in this case
             else -> y1 // No border-collision detected
         }*/ //TODO Might need to also do this when lowering border-line top (not bottom, there physically not possible)
-        circleDef.position.set(x2,y2)
+        circleDef.position.set(x2, y2)
         //TODO I can create circles when pressing in header
         //TODO Einer/Zehner/... Locallisieren mit dem Unicode ICUJ Paket? Auch Zahlwörter?
         //TODO End auch Englische Beschreibung + Englischen Namen in Google Play Store
@@ -204,15 +211,15 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
 fun ShapeRenderer.drawLine(v1: Vector2, v2: Vector2) {
     this.begin(ShapeRenderer.ShapeType.Line)
-    this.line(v1,v2)
+    this.line(v1, v2)
     this.end()
 }
 
 fun ShapeRenderer.drawCircle(c: Fixture) {
     val pos = c.body.position
-    this.circle(pos.x,pos.y,Constants.radiusSprite,50) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
+    this.circle(pos.x, pos.y, Constants.radiusSprite, 50) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
     this.color = c.getColor()
-    this.circle(pos.x,pos.y,Constants.radiusSprite - (Constants.lineWidth * 0.5).toFloat(), 20) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
+    this.circle(pos.x, pos.y, Constants.radiusSprite - (Constants.lineWidth * 0.5).toFloat(), 20) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
     this.color = Constants.lineColor
 }
 
@@ -235,11 +242,11 @@ fun Fixture.updateColor() {
 }
 
 fun Fixture.getColor(): Color {
-    return (this.body.userData as Pair<Color,Int>).first
+    return (this.body.userData as Pair<Color, Int>).first
 }
 
 fun Fixture.getValue(): Int {
-    return (this.body.userData as Pair<Color,Int>).second
+    return (this.body.userData as Pair<Color, Int>).second
 }
 
 fun Fixture.destroy() = this.body.destroyFixture(this)
@@ -259,7 +266,7 @@ fun List<Fixture>.getCirclesOfValue(num: Int, value: Int): List<Fixture>? {//Ret
     return null
 }
 
-fun BitmapFont.drawCentered(batch: SpriteBatch, glyph: GlyphLayout, s: String, xLeft: Float, xRight: Float, y:Float) {
+fun BitmapFont.drawCentered(batch: SpriteBatch, glyph: GlyphLayout, s: String, xLeft: Float, xRight: Float, y: Float) {
     glyph.setText(this, s)
     val textWidth = glyph.width
     val margin = (xRight-(xLeft + textWidth))/2
