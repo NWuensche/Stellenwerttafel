@@ -19,7 +19,8 @@ class MyGdxGame : ApplicationAdapter() {
                 .apply { projectionMatrix = camera.combined }
     }
     //INFO Setting doSleep=false makes movement of other circles while dragging better, and both true/false lag when 200 1-values
-    val world: World by lazy { World(Vector2(0f, 0f), true) } //First is gravity vector, second is CPU optimization on
+    //INFO Furthermore, when doSleep=false no problem with possibility of putting circle directly on boarder and keeping it there
+    val world: World by lazy { World(Vector2(0f, 0f), false) } //First is gravity vector, second is CPU optimization on
     val board: Board by lazy { Board(sR, world) }
     //val debugRenderer: Box2DDebugRenderer by lazy { Box2DDebugRenderer() }
 
@@ -45,6 +46,7 @@ class MyGdxGame : ApplicationAdapter() {
         createBordersBox2D() // Should be after drawing all graphics, else could get out of sync
     }
 
+    //TODO Do in board, already have world
     private fun createBordersBox2D() {
         val borderDef = BodyDef()
         borderDef.position.set(Vector2(0f, Constants.height))

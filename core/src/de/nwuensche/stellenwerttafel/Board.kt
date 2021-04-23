@@ -105,10 +105,26 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
     //Draw new Circle, add Box2D physics and add to list
     fun createNewCircle(x: Float, y: Float) {
         //If I dont check this, then it can happen that when moving 100-circle fast to right/up/down border of 1-value that some circles are generated out of screen (can be seen when going back to 100)
-        circleDef.position.set(x.coerceIn(Constants.widthCircleAndHitbox, Constants.width-Constants.widthCircleAndHitbox),
-                y.coerceIn(Constants.widthCircleAndHitbox, Constants.height - Constants.widthCircleAndHitbox))
-        val body: Body = world.createBody(circleDef)
-        // INFO without this, laying x circle above each other does not make them move until I pull first by hand
+        val x1 = x.coerceIn(Constants.widthCircleAndHitbox, Constants.width-Constants.widthCircleAndHitbox)
+        val y1 = y.coerceIn(Constants.widthCircleAndHitbox, Constants.height - Constants.widthCircleAndHitbox)
+
+        //Also check not inside hitbox of border, else it can happen that e.g. when putting 100-circle on border (to 10-circle) of 1-circle then some circles left and some right, but all green
+        val x2 = when {
+            (x1 >= Constants.firstLineBorderX - Constants.widthCircleAndHitbox) && (x1 <= Constants.firstLineBorderX) -> Constants.firstLineBorderX - Constants.widthCircleAndHitbox //In first hitbox, but closer to 100-box
+            (x1 >= Constants.firstLineBorderX) && (x1 <= Constants.firstLineBorderX + Constants.widthCircleAndHitbox) -> Constants.firstLineBorderX + Constants.widthCircleAndHitbox //In first hitbox, but closer to 10-box
+
+            (x1 >= Constants.secondLineBorderX - Constants.widthCircleAndHitbox) && (x1 <= Constants.secondLineBorderX) -> Constants.secondLineBorderX - Constants.widthCircleAndHitbox //In second hitbox, but closer to 10-box
+            (x1 >= Constants.secondLineBorderX) && (x1 <= Constants.secondLineBorderX + Constants.widthCircleAndHitbox) -> Constants.secondLineBorderX + Constants.widthCircleAndHitbox //In second hitbox, but closer to 1-box
+            else -> x1 // No border-colision detected
+        }
+        //TODO Alex was passiert mit Circlen wenn die über Header landen/liegen? gehen die da überhaupt hin mit drag? Oder werden die direkt gelöscht
+        val y2 = y1 //TODO Might need to also do this when lowering border-line top (not bottom, there physically not possible)
+        circleDef.position.set(x2,y2)
+        //TODO Einer/Zehner/... Locallisieren mit dem Unicode ICUJ Paket? Auch Zahlwörter?
+        //TODO End auch Englische Beschreibung + Englischen Namen in Google Play Store
+
+        val body = world.createBody(circleDef)
+        // INFO without this, creating many circles next to each other does not make them move until I pull first by hand
         body.applyForceToCenter(0.00001f, 0.00001f, true)
 
         val fixture = body.createFixture(fixtureDef)
