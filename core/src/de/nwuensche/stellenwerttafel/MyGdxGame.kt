@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 import com.badlogic.gdx.utils.ScreenUtils
+import de.nwuensche.stellenwerttafel.Constants.widthHitBoxBorders
 
 
 class MyGdxGame : ApplicationAdapter() {
@@ -49,8 +50,6 @@ class MyGdxGame : ApplicationAdapter() {
         borderDef.position.set(Vector2(0f, Constants.height))
         val groundBody = world.createBody(borderDef)
         val groundBox = PolygonShape()
-        val marginCircle = Constants.radiusSprite - Constants.radiusHitBox
-        val widthHitBoxBorders = marginCircle + (0.5 * Constants.lineWidth).toFloat() //Need margin so that circle + border dont overlap because circle spriteradius != hitbox radius
         groundBox.setAsBox(Constants.width, widthHitBoxBorders) //INFO Takes half values as inputs, but I want margin around drawn lines, so 'normal' is ok
         groundBody.createFixture(groundBox, 0.0f)
 
@@ -65,6 +64,7 @@ class MyGdxGame : ApplicationAdapter() {
         val leftBox = PolygonShape()
         leftBox.setAsBox(widthHitBoxBorders, Constants.height)
         leftBody.createFixture(leftBox, 0.0f)
+        //TODO END Schönes Logo
 
         borderDef.position.set(Vector2(Constants.width, 0f))
         val rightBody = world.createBody(borderDef)

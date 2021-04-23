@@ -18,6 +18,10 @@ object Constants {
     val lineWidth = 10f * convertRatio
     val radiusSprite = 50f * convertRatio //Radius for drawn circle
     val radiusHitBox = 20f * convertRatio //Radius for box2d box circle, has to be smaller because otherwise 100 1-circles wobble too much
+    val marginCircle = radiusSprite - radiusHitBox
+    val ratioLineWidth = 0.5
+    val widthHitBoxBorders = marginCircle + (ratioLineWidth * lineWidth).toFloat() //Need margin so that circle + border dont overlap because circle spriteradius != hitbox radius + used to not drag circle out of screen
+    val widthCircleAndHitbox = radiusSprite + (ratioLineWidth * lineWidth).toFloat()
 
     val timeStep = 1/60f
     val speedFactor = 2 //Move circle in 1/x seconds

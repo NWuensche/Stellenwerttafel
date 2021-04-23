@@ -4,6 +4,10 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
+import de.nwuensche.stellenwerttafel.Constants.height
+import de.nwuensche.stellenwerttafel.Constants.width
+import de.nwuensche.stellenwerttafel.Constants.widthCircleAndHitbox
+import de.nwuensche.stellenwerttafel.Constants.widthHitBoxBorders
 
 class Board(val sR: ShapeRenderer, val world: World) : Drawable {
     val circles = arrayListOf<Fixture>()
@@ -62,8 +66,6 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
         val screenYNormalized = screenY * Constants.convertRatio
 
         if (dragState != DragState.DRAGCIRCLE) { // As long as not moved circle, create new one
-            //TODO IN circles.add(Circle(screenX.toFloat(), screenY.toFloat()))
-                // TODO everything might move for all time when I put 100-circle in 1-block
             createNewCircle(screenXNormalized, screenYNormalized)
         } else {
             //Moved Circle, update everything
@@ -71,10 +73,9 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
             dragCircle!!.updateColor()
             val newValue = dragCircle!!.getValue()
 
-            //TODO Dispose draggedCircle
-
             val ratio = oldValue.toFloat()/newValue
             if (ratio >= 1) { // Add circles or do nothing
+                //TODO When creating new circles on right edge, they are spawned out of screen
                 repeat(ratio.toInt() -1) { //Keep original dragged circle, so only create one less, Without keeping dragged circle, new circles wont move, so keep it
                     createNewCircle(screenXNormalized, screenYNormalized)
                 }
@@ -121,8 +122,16 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
         val screenYNormalized = screenY * Constants.convertRatio
 
         if (dragCircle != null) {
-            //TODO I can move circle out of screen (Top,Down,Left,Right)
-            dragCircle?.body?.setTransform(screenXNormalized, screenYNormalized, 0f)
+            //INFO Moving on e.g. y axis ok, even if at border of y axis, so compute both seperately
+            var newX = dragCircle!!.body.position.x
+            var newY = dragCircle!!.body.position.y
+            if((screenXNormalized- widthCircleAndHitbox >= 0) && (screenXNormalized + widthCircleAndHitbox <= width)){
+                newX = screenXNormalized
+            }
+            if((screenYNormalized- widthCircleAndHitbox >= 0) && (screenYNormalized + widthCircleAndHitbox <= height)){
+                newY = screenYNormalized
+            }
+            dragCircle!!.body.setTransform(newX, newY, 0f)
             return
         }
         
