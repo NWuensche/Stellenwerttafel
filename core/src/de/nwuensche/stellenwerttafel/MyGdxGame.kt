@@ -49,37 +49,39 @@ class MyGdxGame : ApplicationAdapter() {
         borderDef.position.set(Vector2(0f, Constants.height))
         val groundBody = world.createBody(borderDef)
         val groundBox = PolygonShape()
-        groundBox.setAsBox(Constants.width, Constants.lineWidth) //INFO Takes half values as inputs, but I want margin around drawn lines, so 'normal' is ok
+        val marginCircle = Constants.radiusSprite - Constants.radiusHitBox
+        val widthHitBoxBorders = marginCircle + (0.5 * Constants.lineWidth).toFloat() //Need margin so that circle + border dont overlap because circle spriteradius != hitbox radius
+        groundBox.setAsBox(Constants.width, widthHitBoxBorders) //INFO Takes half values as inputs, but I want margin around drawn lines, so 'normal' is ok
         groundBody.createFixture(groundBox, 0.0f)
 
         borderDef.position.set(Vector2(0f, 0f))
         val ceilBody = world.createBody(borderDef)
         val ceilBox = PolygonShape()
-        ceilBox.setAsBox(Constants.width, Constants.lineWidth)
+        ceilBox.setAsBox(Constants.width, widthHitBoxBorders)
         ceilBody.createFixture(ceilBox, 0.0f)
 
         borderDef.position.set(Vector2(0f, 0f))
         val leftBody = world.createBody(borderDef)
         val leftBox = PolygonShape()
-        leftBox.setAsBox(Constants.lineWidth, Constants.height)
+        leftBox.setAsBox(widthHitBoxBorders, Constants.height)
         leftBody.createFixture(leftBox, 0.0f)
 
         borderDef.position.set(Vector2(Constants.width, 0f))
         val rightBody = world.createBody(borderDef)
         val rightBox = PolygonShape()
-        rightBox.setAsBox(Constants.lineWidth, Constants.height)
+        rightBox.setAsBox(widthHitBoxBorders, Constants.height)
         rightBody.createFixture(rightBox, 0.0f)
 
         borderDef.position.set(Vector2(Constants.firstLineBorderX, 0f))
         val firstLineBorderBody = world.createBody(borderDef)
         val firstLineBorderBox = PolygonShape()
-        firstLineBorderBox.setAsBox(Constants.lineWidth, Constants.height)
+        firstLineBorderBox.setAsBox(widthHitBoxBorders, Constants.height)
         firstLineBorderBody.createFixture(firstLineBorderBox, 0.0f)
 
         borderDef.position.set(Vector2(Constants.secondLineBorderX, 0f))
         val secondLineBorderBody = world.createBody(borderDef)
         val secondLineBorderBox = PolygonShape()
-        secondLineBorderBox.setAsBox(Constants.lineWidth, Constants.height)
+        secondLineBorderBox.setAsBox(widthHitBoxBorders, Constants.height)
         secondLineBorderBody.createFixture(secondLineBorderBox, 0.0f)
     }
 

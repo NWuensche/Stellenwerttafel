@@ -16,7 +16,8 @@ object Constants {
     val lineWidthOriginal = 10f //Only use this to set line width for ShapeRenderer, for everything else use other lineWidth
 
     val lineWidth = 10f * convertRatio
-    val radius = 50f * convertRatio
+    val radiusSprite = 50f * convertRatio //Radius for drawn circle
+    val radiusHitBox = 20f * convertRatio //Radius for box2d box circle, has to be smaller because otherwise 100 1-circles wobble too much
 
     val timeStep = 1/60f
     val speedFactor = 2 //Move circle in 1/x seconds

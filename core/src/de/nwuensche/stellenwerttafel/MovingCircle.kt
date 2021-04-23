@@ -17,9 +17,9 @@ class MovingCircle(var currentPosition: Vector2, val endPosition: Vector2, val c
 
         sR.run {
             this.begin(ShapeRenderer.ShapeType.Filled)
-            this.circle(currentPosition.x,currentPosition.y,Constants.radius,100) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
+            this.circle(currentPosition.x,currentPosition.y,Constants.radiusSprite,100) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
             this.color = this@MovingCircle.color
-            this.circle(currentPosition.x,currentPosition.y,Constants.radius - (Constants.lineWidth * 0.5).toFloat(), 100) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
+            this.circle(currentPosition.x,currentPosition.y,Constants.radiusSprite - (Constants.lineWidth * 0.5).toFloat(), 100) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
             this.color = Constants.lineColor
             this.end()
         }

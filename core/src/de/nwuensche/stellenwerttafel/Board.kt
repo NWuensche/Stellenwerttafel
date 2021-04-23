@@ -49,7 +49,7 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
 
 
     val circleDef = BodyDef().apply { this.type = BodyDef.BodyType.DynamicBody }
-    val circleShape = CircleShape().apply { this.radius = Constants.radius }
+    val circleShape = CircleShape().apply { this.radius = Constants.radiusHitBox }
     val fixtureDef = FixtureDef().apply {
         this.shape = circleShape
         this.density = 0.2f
@@ -127,10 +127,10 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
         }
         
         for (circle in circles.asReversed()) { //TODO Might be slow, because really reverse list
-            if (((circle.body.position.x - Constants.radius) <= screenXNormalized)
-                    && (screenXNormalized <= (circle.body.position.x + Constants.radius))
-                    && ((circle.body.position.y - Constants.radius) <= screenYNormalized)
-                    && (screenYNormalized <= (circle.body.position.y + Constants.radius))) {
+            if (((circle.body.position.x - Constants.radiusSprite) <= screenXNormalized)
+                    && (screenXNormalized <= (circle.body.position.x + Constants.radiusSprite))
+                    && ((circle.body.position.y - Constants.radiusSprite) <= screenYNormalized)
+                    && (screenYNormalized <= (circle.body.position.y + Constants.radiusSprite))) {
                 dragCircle = circle
                 dragStartPosition = circle.body.position.copy() // Without copy will be changed whole time
                 dragStartColor = circle.getColor()
@@ -150,9 +150,9 @@ fun ShapeRenderer.drawLine(v1: Vector2, v2: Vector2) {
 fun ShapeRenderer.drawCircle(c: Fixture) {
     val pos = c.body.position
     this.begin(ShapeRenderer.ShapeType.Filled)
-    this.circle(pos.x,pos.y,Constants.radius,100) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
+    this.circle(pos.x,pos.y,Constants.radiusSprite,50) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
     this.color = c.getColor()
-    this.circle(pos.x,pos.y,Constants.radius - (Constants.lineWidth * 0.5).toFloat(), 100) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
+    this.circle(pos.x,pos.y,Constants.radiusSprite - (Constants.lineWidth * 0.5).toFloat(), 20) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
     this.color = Constants.lineColor
     this.end() //TODO I should only open shaperenderer once, because explensive: https://stackoverflow.com/questions/29035553/trying-to-draw-a-circle-in-libgdx
 }
