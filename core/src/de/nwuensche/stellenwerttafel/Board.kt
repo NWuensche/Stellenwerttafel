@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.*
 
 class Board(val sR: ShapeRenderer, val world: World) : Drawable {
     val circles = arrayListOf<Fixture>()
+    var movingCircles: MutableList<MovingCircle> = arrayListOf<MovingCircle>()
 
     private enum class DragState {
         NONE, //Not in dragged state
@@ -21,9 +22,11 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
         sR.drawLine(Vector2(Constants.firstLineBorderX, 0f), Vector2(Constants.firstLineBorderX, Constants.height))
         sR.drawLine(Vector2(Constants.secondLineBorderX, 0f), Vector2(Constants.secondLineBorderX, Constants.height))
 
-        for (circle in circles) {
-            sR.drawCircle(circle)
-        }
+        circles.forEach {sR.drawCircle(it)}
+        movingCircles.forEach {it.draw()}
+        //INFO Filter out the ones which are finished
+        //INFO Dont clear all, could do two seperate movements at once
+        movingCircles = movingCircles.filter {it.stillMoving}.toMutableList() //TODO Might be very time/space consuming
     }
 
 
@@ -75,10 +78,11 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
                 val circlesToRemove = circles.getCirclesOfValue(numCirclesToRemove, oldValue)
                 val testCircle = circlesToRemove!![0]
 
-                //TODO Don't want that moving circle collides with anything, so remove its fixture/body first
+                //INFO Don't want that moving circle collides with anything, so remove its fixture/body first
                 circlesToRemove?.forEach {
                     circles.remove(it)
                     it.destroy() //INFO Needed, else still lag although moved circles from 1 to 100
+                    movingCircles.add(MovingCircle(it.body.position, Vector2(screenXNormalized, screenYNormalized), it.getColor(), sR))
                 }
                 //TODO Snap-Back if list is null
             }

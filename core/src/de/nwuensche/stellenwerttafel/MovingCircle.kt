@@ -7,20 +7,33 @@ import com.badlogic.gdx.math.Vector2
 import kotlin.math.sign
 
 //TODO Need to distiguish keep or not keep circle? (Sprite + Create new box2d-body or not?)
-class MovingCircle(var currentPosition: Vector2, val endPosition: Vector2, color: Color, sR: ShapeRenderer) : Drawable {
+//INFO Get list so circles can unsubscribe/clear themselfes
+class MovingCircle(var currentPosition: Vector2, val endPosition: Vector2, val color: Color, val sR: ShapeRenderer) : Drawable {
     private val completeDistance: Vector2 = endPosition.copy().sub(currentPosition)
-    private val startAngleSign = endPosition.angleDeg(currentPosition).sign.toInt()
+    private val startAngleSign = endPosition.angle(currentPosition).sign.toInt()
+    var stillMoving = true
     override fun draw() {
         updatePosition()
+
+        sR.run {
+            this.begin(ShapeRenderer.ShapeType.Filled)
+            this.circle(currentPosition.x,currentPosition.y,Constants.radius,100) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
+            this.color = this@MovingCircle.color
+            this.circle(currentPosition.x,currentPosition.y,Constants.radius - (Constants.lineWidth * 0.5).toFloat(), 100) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
+            this.color = Constants.lineColor
+            this.end()
+        }
     }
 
     //INFO Do Vector Subtraction here to get vector from end to beginning
     fun updatePosition() {
-        val new = currentPosition.copy().mulAdd(completeDistance, speedFactor * Gdx.graphics.deltaTime)
-        val newAngleSign = endPosition.angleDeg(new).sign.toInt()
+        val new = currentPosition.copy().mulAdd(completeDistance, Constants.speedFactor * Gdx.graphics.deltaTime)
+        val newAngleSign = endPosition.angle(new).sign.toInt()
         //INFO 0 iff same vector, != iff "behind" end position
         if (newAngleSign != startAngleSign) {
             currentPosition = endPosition
+            stillMoving = false
+            //Cant do that if currently in foreach-loop in Board.draw: movingCircles.remove(this)
         } else {
             currentPosition = new
         }
