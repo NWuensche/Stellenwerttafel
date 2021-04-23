@@ -1,11 +1,14 @@
 package de.nwuensche.stellenwerttafel
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 
-class Board(val sR: ShapeRenderer, val world: World) : Drawable {
+//batch only used for text
+class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val font: BitmapFont) : Drawable {
     val circles = arrayListOf<Fixture>()
     val movingCircles: MutableList<MovingCircle> = arrayListOf()
 
@@ -27,6 +30,10 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
         sR.drawLine(Vector2(0f, Constants.secondLineBorderY), Vector2(Constants.width, Constants.secondLineBorderY))
 
         sR.drawCircles { circles.forEach {sR.drawCircle(it)} }
+
+        batch.begin()
+        font.draw(batch, "rüÜ5:", Constants.xTitleTable100, Constants.yTitlesTables)
+        batch.end()
 
         val movingCirclesToDelete = arrayListOf<MovingCircle>() //Store all circles which are at endposition, because I cant remove while iterating over collection, is forbidden
         movingCircles.forEach {
@@ -71,7 +78,7 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
 
             val ratio = oldValue.toFloat()/newValue
             if (ratio >= 1) { // Add circles or do nothing
-                repeat(ratio.toInt() -1) { //Keep original dragged circle, so only create one less, Without keeping dragged circle, new circles wont move, so keep it
+                repeat(ratio.toInt() - 1) { //Keep original dragged circle, so only create one less, Without keeping dragged circle, new circles wont move, so keep it
                     createNewCircle(screenXNormalized, screenYNormalized)
                 }
             } else { //Remove circles
@@ -109,7 +116,7 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
             return
         }
         //If I dont check this, then it can happen that when moving 100-circle fast to right/up/down border of 1-value that some circles are generated out of screen (can be seen when going back to 100)
-        val x1 = x.coerceIn(Constants.widthCircleAndHitbox, Constants.width-Constants.widthCircleAndHitbox)
+        val x1 = x.coerceIn(Constants.widthCircleAndHitbox, Constants.width - Constants.widthCircleAndHitbox)
         val y1 = y.coerceIn(Constants.firstLineBorderY + Constants.widthCircleAndHitbox, Constants.height - Constants.widthCircleAndHitbox)
         //TODO Store State when pausing
         //Also check not inside hitbox of border, else it can happen that e.g. when putting 100-circle on border (to 10-circle) of 1-circle then some circles left and some right, but all green

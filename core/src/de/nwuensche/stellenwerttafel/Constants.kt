@@ -39,9 +39,9 @@ object Constants {
     val circleGreenValue = 1
 
     val density = Gdx.graphics.density
-    val fontSize = (density * 45).toInt() //TODO End check emulator + Mama/Alex if this wors fine on other displays as well
+    val fontSize = (density * 35).toInt() //TODO End check emulator + Mama/Alex if this wors fine on other displays as well
     val scaleFont = 1f/Gdx.graphics.width - 1
 
     val xTitleTable100 = width/10
-    val yTitlesTables = 0.8f*firstLineBorderY
+    val yTitlesTables = 0.65f*firstLineBorderY
 }
