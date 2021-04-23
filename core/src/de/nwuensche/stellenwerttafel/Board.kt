@@ -125,8 +125,7 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
 
         val body = world.createBody(circleDef)
         // INFO without this, creating many circles next to each other does not make them move until I pull first by hand
-        body.applyForceToCenter(0.00001f, 0.00001f, true)
-
+        body.applyLinearImpulse(Vector2(0.0001f, 0.0001f), body.position, true) //Impulse applies once, Force continiously
         val fixture = body.createFixture(fixtureDef)
         fixture.updateColor()
         circles.add(fixture)
