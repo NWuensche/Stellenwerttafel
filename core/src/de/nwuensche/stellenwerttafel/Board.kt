@@ -4,11 +4,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
-import de.nwuensche.stellenwerttafel.Constants.height
-import de.nwuensche.stellenwerttafel.Constants.lineWidth
-import de.nwuensche.stellenwerttafel.Constants.width
-import de.nwuensche.stellenwerttafel.Constants.widthCircleAndHitbox
-import de.nwuensche.stellenwerttafel.Constants.widthHitBoxBorders
 
 class Board(val sR: ShapeRenderer, val world: World) : Drawable {
     val circles = arrayListOf<Fixture>()
@@ -24,10 +19,13 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
     var dragCircle: Fixture? = null
     var dragStartColor: Color? = null // Will for jump back circles be overwritten, so store it first
 
-
     override fun draw() {
-        sR.drawLine(Vector2(Constants.firstLineBorderX, 0f), Vector2(Constants.firstLineBorderX, Constants.height))
-        sR.drawLine(Vector2(Constants.secondLineBorderX, 0f), Vector2(Constants.secondLineBorderX, Constants.height))
+        sR.drawLine(Vector2(Constants.firstLineBorderX, Constants.secondLineBorderY), Vector2(Constants.firstLineBorderX, Constants.height))
+        sR.drawLine(Vector2(Constants.secondLineBorderX, Constants.secondLineBorderY), Vector2(Constants.secondLineBorderX, Constants.height))
+
+        sR.drawLine(Vector2(0f, Constants.firstLineBorderY), Vector2(Constants.width, Constants.firstLineBorderY))
+        sR.drawLine(Vector2(0f, Constants.secondLineBorderY), Vector2(Constants.width, Constants.secondLineBorderY))
+
 
         circles.forEach {sR.drawCircle(it)}
         for (it in movingCircles) {
@@ -107,7 +105,8 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
     //Draw new Circle, add Box2D physics and add to list
     fun createNewCircle(x: Float, y: Float) {
         //If I dont check this, then it can happen that when moving 100-circle fast to right/up/down border of 1-value that some circles are generated out of screen (can be seen when going back to 100)
-        circleDef.position.set(x.coerceIn(widthCircleAndHitbox, width-widthCircleAndHitbox),y.coerceIn(widthCircleAndHitbox, height - widthCircleAndHitbox))
+        circleDef.position.set(x.coerceIn(Constants.widthCircleAndHitbox, Constants.width-Constants.widthCircleAndHitbox),
+                y.coerceIn(Constants.widthCircleAndHitbox, Constants.height - Constants.widthCircleAndHitbox))
         val body: Body = world.createBody(circleDef)
         // INFO without this, laying x circle above each other does not make them move until I pull first by hand
         body.applyForceToCenter(0.00001f, 0.00001f, true)
@@ -125,10 +124,10 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
             //INFO Moving on e.g. y axis ok, even if at border of y axis, so compute both seperately
             var newX = dragCircle!!.body.position.x
             var newY = dragCircle!!.body.position.y
-            if((screenXNormalized- widthCircleAndHitbox >= 0) && (screenXNormalized + widthCircleAndHitbox <= width)){
+            if((screenXNormalized- Constants.widthCircleAndHitbox >= 0) && (screenXNormalized + Constants.widthCircleAndHitbox <= Constants.width)){
                 newX = screenXNormalized
             }
-            if((screenYNormalized- widthCircleAndHitbox >= 0) && (screenYNormalized + widthCircleAndHitbox <= height)){
+            if((screenYNormalized- Constants.widthCircleAndHitbox >= 0) && (screenYNormalized + Constants.widthCircleAndHitbox <= Constants.height)){
                 newY = screenYNormalized
             }
             dragCircle!!.body.setTransform(newX, newY, 0f)

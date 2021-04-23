@@ -11,6 +11,10 @@ object Constants {
     //2 borders for board x position
     val firstLineBorderX = width / 3f
     val secondLineBorderX = (2 / 3f) * width
+    //2 borders for header
+    val firstLineBorderY = height/4f
+    val secondLineBorderY = height/8f
+
 
     //TODO Relative to width? Check with emulator + Other smartphones like Alex
     val lineWidthOriginal = 10f //Only use this to set line width for ShapeRenderer, for everything else use other lineWidth
