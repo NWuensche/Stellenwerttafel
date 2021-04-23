@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
+import com.ibm.icu.text.MessageFormat
 
 //batch only used for text
 class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val font: BitmapFont) : Drawable {
@@ -36,10 +37,11 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         sR.drawLine(Vector2(0f, Constants.secondLineBorderY), Vector2(Constants.width, Constants.secondLineBorderY))
 
         sR.drawCircles { circles.forEach {sR.drawCircle(it)} }
-
+        //TODO END also name app English when uploading english version
         batch.begin()
         val sum = Constants.circle100Value*titleTable100Number + Constants.circle10Value*titleTable10Number + Constants.circle1Value*titleTable1Number
-        font.drawCentered(batch, this.glyph, "$sum" , 0f, Constants.width, Constants.yTitleTableHead) // TODO Add word
+        val sumLocalizedText = MessageFormat.format("{0,spellout}", sum).replace(" ","").replace("\u00AD","").replace("-","").capitalize() //replace '-' and unicode-version of '-' because zweihundert is actually 'zwei-hundert', same holds for ' ' in english
+        font.drawCentered(batch, this.glyph, "$sum = $sumLocalizedText" , 0f, Constants.width, Constants.yTitleTableHead) // TODO Add word
         //TODO Internationalize Hunderter/Zehner/Einer
         font.drawCentered(batch, this.glyph, "$titleTable100Number Hunderter" , 0f, Constants.firstLineBorderX, Constants.yTitlesTables)
         font.drawCentered(batch, this.glyph, "$titleTable10Number Zehner" , Constants.firstLineBorderX, Constants.secondLineBorderX, Constants.yTitlesTables)

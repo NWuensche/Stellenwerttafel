@@ -75,5 +75,6 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+        implementation group: 'com.ibm.icu', name: 'icu4j', version: '69.1'
     }
 }
