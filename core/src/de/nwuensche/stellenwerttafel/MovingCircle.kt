@@ -7,11 +7,11 @@ import com.badlogic.gdx.math.Vector2
 import kotlin.math.sign
 
 //TODO Need to distiguish keep or not keep circle? (Sprite + Create new box2d-body or not?)
-//INFO Get list so circles can unsubscribe/clear themselfes
-class MovingCircle(var currentPosition: Vector2, val endPosition: Vector2, val color: Color, val sR: ShapeRenderer) : Drawable {
+//keep = true if after movement circle should still be their (used when circle jumps back)
+class MovingCircle(var currentPosition: Vector2, val endPosition: Vector2, val color: Color, val sR: ShapeRenderer, val keep: Boolean = false) : Drawable {
     private val completeDistance: Vector2 = endPosition.copy().sub(currentPosition)
     private val startAngleSign = endPosition.angle(currentPosition).sign.toInt()
-    var stillMoving = true
+    var atEnd = false
     override fun draw() {
         updatePosition()
 
@@ -25,6 +25,12 @@ class MovingCircle(var currentPosition: Vector2, val endPosition: Vector2, val c
         }
     }
 
+    //returns true iff circle at end destination
+    fun drawAndFinished(): Boolean {
+        this.draw()
+        return atEnd
+    }
+
     //INFO Do Vector Subtraction here to get vector from end to beginning
     fun updatePosition() {
         val new = currentPosition.copy().mulAdd(completeDistance, Constants.speedFactor * Gdx.graphics.deltaTime)
@@ -32,7 +38,7 @@ class MovingCircle(var currentPosition: Vector2, val endPosition: Vector2, val c
         //INFO 0 iff same vector, != iff "behind" end position
         if (newAngleSign != startAngleSign) {
             currentPosition = endPosition
-            stillMoving = false
+            atEnd = true
             //Cant do that if currently in foreach-loop in Board.draw: movingCircles.remove(this)
         } else {
             currentPosition = new

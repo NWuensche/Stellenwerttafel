@@ -7,7 +7,7 @@ import com.badlogic.gdx.physics.box2d.*
 
 class Board(val sR: ShapeRenderer, val world: World) : Drawable {
     val circles = arrayListOf<Fixture>()
-    var movingCircles: MutableList<MovingCircle> = arrayListOf<MovingCircle>()
+    val movingCircles: MutableList<MovingCircle> = arrayListOf()
 
     private enum class DragState {
         NONE, //Not in dragged state
@@ -15,7 +15,9 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
         DRAGNOTHING // dragged, but first touch on nothing
     }
     private var dragState = DragState.NONE
-    var draggedCircle: Fixture? = null
+    var dragStartPosition: Vector2? = null
+    var dragCircle: Fixture? = null
+    var dragStartColor: Color? = null // Will for jump back circles be overwritten, so store it first
 
 
     override fun draw() {
@@ -23,10 +25,26 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
         sR.drawLine(Vector2(Constants.secondLineBorderX, 0f), Vector2(Constants.secondLineBorderX, Constants.height))
 
         circles.forEach {sR.drawCircle(it)}
-        movingCircles.forEach {it.draw()}
+        for (it in movingCircles) {
+
+        }
+        val movingCirclesToDelete = arrayListOf<MovingCircle>() //Store all circles which are at endposition, because I cant remove while iterating over collection, is forbidden
+        movingCircles.forEach {
+            val atEnd = it.drawAndFinished()
+            if (atEnd) {
+                movingCirclesToDelete.add(it)
+            }
+        }
+        movingCirclesToDelete.forEach {
+            if (it.keep) { //Create new circle with physics (used when jump back circle)
+                createNewCircle(it.endPosition.x, it.endPosition.y)
+            }
+            movingCircles.remove(it)
+        }
+
         //INFO Filter out the ones which are finished
         //INFO Dont clear all, could do two seperate movements at once
-        movingCircles = movingCircles.filter {it.stillMoving}.toMutableList() //TODO Might be very time/space consuming
+        //movingCircles = movingCircles.filter {it.stillMoving}.toMutableList() //TODO Might be very time/space consuming
     }
 
 
@@ -43,27 +61,15 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
         val screenXNormalized = screenX * Constants.convertRatio
         val screenYNormalized = screenY * Constants.convertRatio
 
-        //Draw new Circle and add to list
-        fun createNewCircle(x: Float, y: Float) {
-            circleDef.position.set(x,y)
-            val body: Body = world.createBody(circleDef)
-            // INFO without this, laying x circle above each other does not make them move until I pull first by hand
-            body.applyForceToCenter(0.00001f, 0.00001f, true)
-
-            val fixture = body.createFixture(fixtureDef) //TODO dispose fixture when circle merged or deleted
-            fixture.updateColor()
-            circles.add(fixture)
-        }
-
         if (dragState != DragState.DRAGCIRCLE) { // As long as not moved circle, create new one
             //TODO IN circles.add(Circle(screenX.toFloat(), screenY.toFloat()))
                 // TODO everything might move for all time when I put 100-circle in 1-block
             createNewCircle(screenXNormalized, screenYNormalized)
         } else {
             //Moved Circle, update everything
-            val oldValue = draggedCircle!!.getValue()
-            draggedCircle!!.updateColor()
-            val newValue = draggedCircle!!.getValue()
+            val oldValue = dragCircle!!.getValue()
+            dragCircle!!.updateColor()
+            val newValue = dragCircle!!.getValue()
 
             //TODO Dispose draggedCircle
 
@@ -76,31 +82,47 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
                 //Again, keep original dragged circle
                 val numCirclesToRemove = (1/ratio).toInt() - 1 //keep dragged one, so -1
                 val circlesToRemove = circles.getCirclesOfValue(numCirclesToRemove, oldValue)
-                val testCircle = circlesToRemove!![0]
-
                 //INFO Don't want that moving circle collides with anything, so remove its fixture/body first
+                if (circlesToRemove == null) {
+                    movingCircles.add(MovingCircle(dragCircle!!.body.position, dragStartPosition!!, dragStartColor!!, sR, keep = true))
+                    circles.remove(dragCircle!!)
+                    dragCircle!!.destroy()
+                }
                 circlesToRemove?.forEach {
+                    movingCircles.add(MovingCircle(it.body.position, Vector2(screenXNormalized, screenYNormalized), it.getColor(), sR))
                     circles.remove(it)
                     it.destroy() //INFO Needed, else still lag although moved circles from 1 to 100
-                    movingCircles.add(MovingCircle(it.body.position, Vector2(screenXNormalized, screenYNormalized), it.getColor(), sR))
                 }
                 //TODO Snap-Back if list is null
             }
         }
 
         //reset
-        draggedCircle = null
+        dragCircle = null
         dragState = DragState.NONE
+        dragStartPosition = null
+        dragStartColor = null
+    }
 
+    //Draw new Circle, add Box2D physics and add to list
+    fun createNewCircle(x: Float, y: Float) {
+        circleDef.position.set(x,y)
+        val body: Body = world.createBody(circleDef)
+        // INFO without this, laying x circle above each other does not make them move until I pull first by hand
+        body.applyForceToCenter(0.00001f, 0.00001f, true)
+
+        val fixture = body.createFixture(fixtureDef) //TODO dispose fixture when circle merged or deleted
+        fixture.updateColor()
+        circles.add(fixture)
     }
 
     fun touchDragged(screenX: Int, screenY: Int, pointer: Int) {
         val screenXNormalized = screenX * Constants.convertRatio
         val screenYNormalized = screenY * Constants.convertRatio
 
-        if (draggedCircle != null) {
+        if (dragCircle != null) {
             //TODO I can move circle out of screen (Top,Down,Left,Right)
-            draggedCircle?.body?.setTransform(screenXNormalized, screenYNormalized, 0f)
+            dragCircle?.body?.setTransform(screenXNormalized, screenYNormalized, 0f)
             return
         }
         
@@ -109,11 +131,13 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
                     && (screenXNormalized <= (circle.body.position.x + Constants.radius))
                     && ((circle.body.position.y - Constants.radius) <= screenYNormalized)
                     && (screenYNormalized <= (circle.body.position.y + Constants.radius))) {
-                draggedCircle = circle
+                dragCircle = circle
+                dragStartPosition = circle.body.position.copy() // Without copy will be changed whole time
+                dragStartColor = circle.getColor()
                 break
             }
         }
-        dragState = if (draggedCircle != null) DragState.DRAGCIRCLE else DragState.DRAGNOTHING
+        dragState = if (dragCircle != null) DragState.DRAGCIRCLE else DragState.DRAGNOTHING
     }
 }
 
