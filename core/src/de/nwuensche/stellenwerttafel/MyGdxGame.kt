@@ -70,13 +70,13 @@ class MyGdxGame : ApplicationAdapter() {
         rightBox.setAsBox(Constants.lineWidth, Constants.height)
         rightBody.createFixture(rightBox, 0.0f)
 
-        borderDef.position.set(Vector2(Constants.firstLineBorderWidth, 0f))
+        borderDef.position.set(Vector2(Constants.firstLineBorderX, 0f))
         val firstLineBorderBody = world.createBody(borderDef)
         val firstLineBorderBox = PolygonShape()
         firstLineBorderBox.setAsBox(Constants.lineWidth, Constants.height)
         firstLineBorderBody.createFixture(firstLineBorderBox, 0.0f)
 
-        borderDef.position.set(Vector2(Constants.secondLineBorderWidth, 0f))
+        borderDef.position.set(Vector2(Constants.secondLineBorderX, 0f))
         val secondLineBorderBody = world.createBody(borderDef)
         val secondLineBorderBox = PolygonShape()
         secondLineBorderBox.setAsBox(Constants.lineWidth, Constants.height)

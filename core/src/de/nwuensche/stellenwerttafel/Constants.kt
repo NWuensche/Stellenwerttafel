@@ -8,9 +8,9 @@ object Constants {
     val height = Gdx.graphics.height.toFloat() / Gdx.graphics.width
     val convertRatio = 1f/Gdx.graphics.width
 
-    //2 borders for board
-    val firstLineBorderWidth = width / 3f
-    val secondLineBorderWidth = (2 / 3f) * width
+    //2 borders for board x position
+    val firstLineBorderX = width / 3f
+    val secondLineBorderX = (2 / 3f) * width
 
     //TODO Relative to width? Check with emulator + Other smartphones like Alex
     val lineWidthOriginal = 10f //Only use this to set line width for ShapeRenderer, for everything else use other lineWidth
@@ -22,4 +22,6 @@ object Constants {
 
     val lineColor = Color.BLACK
     val circleRedColor = Color.RED
+    val circleBlueColor = Color.BLUE
+    val circleGreenColor = Color.GREEN
 }

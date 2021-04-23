@@ -1,10 +1,10 @@
 package de.nwuensche.stellenwerttafel
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 
-typealias Circle = Vector2
 class Board(val sR: ShapeRenderer, val world: World): Drawable {
     val circles = arrayListOf<Fixture>()
 
@@ -18,8 +18,8 @@ class Board(val sR: ShapeRenderer, val world: World): Drawable {
 
 
     override fun draw() {
-        sR.drawLine(Vector2(Constants.firstLineBorderWidth, 0f), Vector2(Constants.firstLineBorderWidth, Constants.height))
-        sR.drawLine(Vector2(Constants.secondLineBorderWidth, 0f), Vector2(Constants.secondLineBorderWidth, Constants.height))
+        sR.drawLine(Vector2(Constants.firstLineBorderX, 0f), Vector2(Constants.firstLineBorderX, Constants.height))
+        sR.drawLine(Vector2(Constants.secondLineBorderX, 0f), Vector2(Constants.secondLineBorderX, Constants.height))
 
         for (circle in circles) {
             sR.drawCircle(circle)
@@ -39,9 +39,11 @@ class Board(val sR: ShapeRenderer, val world: World): Drawable {
     fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int) {
         if (dragState != DragState.DRAGCIRCLE) { // As long as not moved circle, create new one
             //TODO IN circles.add(Circle(screenX.toFloat(), screenY.toFloat()))
+                // TODO everything might move for all time when I put 100-circle in 1-block
             circleDef.position.set(screenX.toFloat() * Constants.convertRatio, screenY.toFloat() * Constants.convertRatio)
             val body: Body = world.createBody(circleDef)
             val fixture = body.createFixture(fixtureDef) //TODO dispose fixture when circle merged or deleted
+            fixture.updateColor()
             circles.add(fixture)
         }
 
@@ -55,6 +57,7 @@ class Board(val sR: ShapeRenderer, val world: World): Drawable {
         val screenYNormalized = screenY * Constants.convertRatio
 
         if (draggedCircle != null) {
+            //TODO I can move circle out of screen (Top,Down,Left,Right)
             draggedCircle?.body?.setTransform(screenXNormalized, screenYNormalized, 0f)
             return
         }
@@ -82,8 +85,23 @@ fun ShapeRenderer.drawCircle(c: Fixture) {
     val pos = c.body.position
     this.begin(ShapeRenderer.ShapeType.Filled)
     this.circle(pos.x,pos.y,Constants.radius,100) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
-    this.color = Constants.circleRedColor
-    this.circle(pos.x,pos.y,Constants.radius - Constants.lineWidth, 100) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
+    this.color = c.getColor()
+    this.circle(pos.x,pos.y,Constants.radius - (Constants.lineWidth * 0.5).toFloat(), 100) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
     this.color = Constants.lineColor
     this.end() //TODO I should only open shaperenderer once, because explensive: https://stackoverflow.com/questions/29035553/trying-to-draw-a-circle-in-libgdx
+}
+
+//Return right color, depending on x-coordinate
+//Dont do this all the time because circle should keep color while dragging
+fun Fixture.updateColor() {
+    val x = this.body.position.x
+    this.body.userData = when {
+        x >= Constants.secondLineBorderX -> Constants.circleGreenColor
+        x >= Constants.firstLineBorderX -> Constants.circleBlueColor
+        else -> Constants.circleRedColor
+    }
+}
+
+fun Fixture.getColor(): Color {
+    return this.body.userData as Color
 }
