@@ -11,6 +11,10 @@ import com.badlogic.gdx.physics.box2d.*
 class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val font: BitmapFont) : Drawable {
     val circles = arrayListOf<Fixture>()
     val movingCircles: MutableList<MovingCircle> = arrayListOf()
+    var titleTable100Number = 0 // Updating string also updates text on screen automatically
+    var titleTable10Number = 0
+    var titleTable1Number = 0
+
 
     private enum class DragState {
         NONE, //Not in dragged state
@@ -32,7 +36,10 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         sR.drawCircles { circles.forEach {sR.drawCircle(it)} }
 
         batch.begin()
-        font.draw(batch, "rüÜ5:", Constants.xTitleTable100, Constants.yTitlesTables)
+        //TODO Internationalize Hunderter/Zehner/Einer
+        font.draw(batch, "$titleTable100Number Hunderter" , Constants.xTitleTable100, Constants.yTitlesTables)
+        font.draw(batch, "$titleTable10Number Zehner", Constants.xTitleTable10, Constants.yTitlesTables)
+        font.draw(batch, "$titleTable1Number Einer", Constants.xTitleTable1, Constants.yTitlesTables)
         batch.end()
 
         val movingCirclesToDelete = arrayListOf<MovingCircle>() //Store all circles which are at endposition, because I cant remove while iterating over collection, is forbidden
@@ -104,6 +111,12 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         dragState = DragState.NONE
         dragStartPosition = null
         dragStartColor = null
+
+        //update counter
+        //TODO Could be faster by traversing only once
+        titleTable100Number = circles.filter{it.getColor() == Constants.circle100Color}.size
+        titleTable10Number = circles.filter{it.getColor() == Constants.circle10Color}.size
+        titleTable1Number = circles.filter{it.getColor() == Constants.circle1Color}.size
     }
 
     //Draw new Circle, add Box2D physics and add to list
@@ -208,9 +221,9 @@ fun ShapeRenderer.drawCircles(f: () -> Unit) {
 fun Fixture.updateColor() {
     val x = this.body.position.x
     this.body.userData = when {
-        x >= Constants.secondLineBorderX -> Pair(Constants.circleGreenColor, Constants.circleGreenValue)
-        x >= Constants.firstLineBorderX -> Pair(Constants.circleBlueColor, Constants.circleBlueValue)
-        else -> Pair(Constants.circleRedColor, Constants.circleRedValue)
+        x >= Constants.secondLineBorderX -> Pair(Constants.circle1Color, Constants.circle1Value)
+        x >= Constants.firstLineBorderX -> Pair(Constants.circle10Color, Constants.circle10Value)
+        else -> Pair(Constants.circle100Color, Constants.circle100Value)
     }
 }
 

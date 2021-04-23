@@ -31,17 +31,19 @@ object Constants {
     val speedFactor = 2 //Move circle in 1/x seconds
 
     val lineColor = Color.BLACK
-    val circleRedColor = Color.RED
-    val circleBlueColor = Color.BLUE
-    val circleGreenColor = Color.GREEN
-    val circleRedValue = 100
-    val circleBlueValue = 10
-    val circleGreenValue = 1
+    val circle100Color = Color.RED
+    val circle10Color = Color.BLUE
+    val circle1Color = Color.GREEN
+    val circle100Value = 100
+    val circle10Value = 10
+    val circle1Value = 1
 
     val density = Gdx.graphics.density
     val fontSize = (density * 35).toInt() //TODO End check emulator + Mama/Alex if this wors fine on other displays as well
     val scaleFont = 1f/Gdx.graphics.width - 1
 
     val xTitleTable100 = width/10
+    val xTitleTable10 = (1f/3 * width) + xTitleTable100
+    val xTitleTable1 = (2f/3 * width) + xTitleTable100
     val yTitlesTables = 0.65f*firstLineBorderY
 }
