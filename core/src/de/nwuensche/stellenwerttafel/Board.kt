@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 import de.nwuensche.stellenwerttafel.Constants.height
+import de.nwuensche.stellenwerttafel.Constants.lineWidth
 import de.nwuensche.stellenwerttafel.Constants.width
 import de.nwuensche.stellenwerttafel.Constants.widthCircleAndHitbox
 import de.nwuensche.stellenwerttafel.Constants.widthHitBoxBorders
@@ -75,7 +76,6 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
 
             val ratio = oldValue.toFloat()/newValue
             if (ratio >= 1) { // Add circles or do nothing
-                //TODO When creating new circles on right edge, they are spawned out of screen
                 repeat(ratio.toInt() -1) { //Keep original dragged circle, so only create one less, Without keeping dragged circle, new circles wont move, so keep it
                     createNewCircle(screenXNormalized, screenYNormalized)
                 }
@@ -94,7 +94,6 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
                     circles.remove(it)
                     it.destroy() //INFO Needed, else still lag although moved circles from 1 to 100
                 }
-                //TODO Snap-Back if list is null
             }
         }
 
@@ -107,12 +106,13 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
 
     //Draw new Circle, add Box2D physics and add to list
     fun createNewCircle(x: Float, y: Float) {
-        circleDef.position.set(x,y)
+        //If I dont check this, then it can happen that when moving 100-circle fast to right/up/down border of 1-value that some circles are generated out of screen (can be seen when going back to 100)
+        circleDef.position.set(x.coerceIn(widthCircleAndHitbox, width-widthCircleAndHitbox),y.coerceIn(widthCircleAndHitbox, height - widthCircleAndHitbox))
         val body: Body = world.createBody(circleDef)
         // INFO without this, laying x circle above each other does not make them move until I pull first by hand
         body.applyForceToCenter(0.00001f, 0.00001f, true)
 
-        val fixture = body.createFixture(fixtureDef) //TODO dispose fixture when circle merged or deleted
+        val fixture = body.createFixture(fixtureDef)
         fixture.updateColor()
         circles.add(fixture)
     }

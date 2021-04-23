@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import kotlin.math.sign
 
-//TODO Need to distiguish keep or not keep circle? (Sprite + Create new box2d-body or not?)
 //keep = true if after movement circle should still be their (used when circle jumps back)
 class MovingCircle(var currentPosition: Vector2, val endPosition: Vector2, val color: Color, val sR: ShapeRenderer, val keep: Boolean = false) : Drawable {
     private val completeDistance: Vector2 = endPosition.copy().sub(currentPosition)

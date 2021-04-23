@@ -19,20 +19,21 @@ class MyGdxGame : ApplicationAdapter() {
                 .apply { color = Constants.lineColor }
                 .apply { projectionMatrix = camera.combined }
     }
-    //TODO Setting doSleep=false makes movement of other circles while dragging better
-    val world: World by lazy { World(Vector2(0f, 0f), false) } //First is gravity vector, second is CPU optimization on
+    //INFO Setting doSleep=false makes movement of other circles while dragging better, and both true/false lag when 200 1-values
+    val world: World by lazy { World(Vector2(0f, 0f), true) } //First is gravity vector, second is CPU optimization on
     val board: Board by lazy { Board(sR, world) }
-    val debugRenderer: Box2DDebugRenderer by lazy { Box2DDebugRenderer() } //TODO Use real renderer
+    //val debugRenderer: Box2DDebugRenderer by lazy { Box2DDebugRenderer() }
 
 
     override fun create() {
         Gdx.gl.glLineWidth(Constants.lineWidthOriginal)
 
         Gdx.input.inputProcessor = object : InputAdapter() {
+            //TODO Remove circle when moved top
             override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-                //TODO Interssting if (img.getBoundingRectangle().contains(screenX, screenY)) println("Image Clicked")
+                //TODO Interssting for buttons (img.getBoundingRectangle().contains(screenX, screenY)) println("Image Clicked")
                 board.touchUp(screenX, screenY, pointer, button) //TODO Alex ist das touchUp oder touchDown?
-                //TODO Alex Touch Drag auf nichts erstellt am Ende auch Button oder nicht?
+                //TODO Alex Touch Drag auf nichts erstellt am Ende auch Button oder nicht? oder vielleicht sogar am Anfang?
                 return true
             }
 
