@@ -37,19 +37,55 @@ class Board(val sR: ShapeRenderer, val world: World): Drawable {
     }
 
     fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int) {
-        if (dragState != DragState.DRAGCIRCLE) { // As long as not moved circle, create new one
-            //TODO IN circles.add(Circle(screenX.toFloat(), screenY.toFloat()))
-                // TODO everything might move for all time when I put 100-circle in 1-block
-            circleDef.position.set(screenX.toFloat() * Constants.convertRatio, screenY.toFloat() * Constants.convertRatio)
+        val screenXNormalized = screenX * Constants.convertRatio
+        val screenYNormalized = screenY * Constants.convertRatio
+
+        //Draw new Circle and add to list
+        fun createNewCircle(x: Float, y: Float) {
+            circleDef.position.set(x,y)
             val body: Body = world.createBody(circleDef)
+            // INFO without this, laying x circle above each other does not make them move until I pull first by hand
+            body.applyForceToCenter(0.00001f, 0.00001f, true)
+
             val fixture = body.createFixture(fixtureDef) //TODO dispose fixture when circle merged or deleted
             fixture.updateColor()
             circles.add(fixture)
         }
 
+        if (dragState != DragState.DRAGCIRCLE) { // As long as not moved circle, create new one
+            //TODO IN circles.add(Circle(screenX.toFloat(), screenY.toFloat()))
+                // TODO everything might move for all time when I put 100-circle in 1-block
+            createNewCircle(screenXNormalized, screenYNormalized)
+        } else {
+            //Moved Circle, update everything
+            val oldValue = draggedCircle!!.getValue()
+            draggedCircle!!.updateColor()
+            val newValue = draggedCircle!!.getValue()
+
+            //TODO Dispose draggedCircle
+
+            val ratio = oldValue.toFloat()/newValue
+            if (ratio >= 1) { // Add circles or do nothing
+                repeat(ratio.toInt() -1) { //Keep original dragged circle, so only create one less, Without keeping dragged circle, new circles wont move, so keep it
+                    createNewCircle(screenXNormalized, screenYNormalized)
+                }
+            } else { //Remove circles
+                //Again, keep original dragged circle
+                val numCirclesToRemove = (1/ratio).toInt() - 1 //keep dragged one, so -1
+                val circlesToRemove = circles.getCirclesOfValue(numCirclesToRemove, oldValue)
+                val testCircle = circlesToRemove!![0]
+                circlesToRemove?.forEach {
+                    circles.remove(it)
+                    it.destroy() //INFO Needed, else still lag although moved circles from 1 to 100
+                }
+                //TODO Snap-Back if list is null
+            }
+        }
+
         //reset
         draggedCircle = null
         dragState = DragState.NONE
+
     }
 
     fun touchDragged(screenX: Int, screenY: Int, pointer: Int) {
@@ -96,12 +132,33 @@ fun ShapeRenderer.drawCircle(c: Fixture) {
 fun Fixture.updateColor() {
     val x = this.body.position.x
     this.body.userData = when {
-        x >= Constants.secondLineBorderX -> Constants.circleGreenColor
-        x >= Constants.firstLineBorderX -> Constants.circleBlueColor
-        else -> Constants.circleRedColor
+        x >= Constants.secondLineBorderX -> Pair(Constants.circleGreenColor, Constants.circleGreenValue)
+        x >= Constants.firstLineBorderX -> Pair(Constants.circleBlueColor, Constants.circleBlueValue)
+        else -> Pair(Constants.circleRedColor, Constants.circleRedValue)
     }
 }
 
 fun Fixture.getColor(): Color {
-    return this.body.userData as Color
+    return (this.body.userData as Pair<Color,Int>).first
+}
+
+fun Fixture.getValue(): Int {
+    return (this.body.userData as Pair<Color,Int>).second
+}
+
+fun Fixture.destroy() = this.body.destroyFixture(this)
+
+fun List<Fixture>.getCirclesOfValue(num: Int, value: Int): List<Fixture>? {//Return no list if not enough circles
+    if (num == 0) return emptyList() // Do this for easier if-else stuff after for-loop
+
+    val out = arrayListOf<Fixture>()
+    for (circle in this.asReversed()) { //TODO Might be slow, because really reverse list
+        if (circle.getValue() == value) {
+            out.add(circle)
+        }
+        if (out.size == num) {
+            return out
+        }
+    }
+    return null
 }

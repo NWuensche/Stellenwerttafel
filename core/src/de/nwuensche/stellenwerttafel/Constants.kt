@@ -24,4 +24,7 @@ object Constants {
     val circleRedColor = Color.RED
     val circleBlueColor = Color.BLUE
     val circleGreenColor = Color.GREEN
+    val circleRedValue = 100
+    val circleBlueValue = 10
+    val circleGreenValue = 1
 }
