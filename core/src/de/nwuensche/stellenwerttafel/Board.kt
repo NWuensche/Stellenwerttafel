@@ -2,6 +2,7 @@ package de.nwuensche.stellenwerttafel
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
@@ -14,6 +15,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
     var titleTable100Number = 0 // Updating string also updates text on screen automatically
     var titleTable10Number = 0
     var titleTable1Number = 0
+    val glyph = GlyphLayout(font, "")
 
 
     private enum class DragState {
@@ -36,10 +38,13 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         sR.drawCircles { circles.forEach {sR.drawCircle(it)} }
 
         batch.begin()
+        val sum = Constants.circle100Value*titleTable100Number + Constants.circle10Value*titleTable10Number + Constants.circle1Value*titleTable1Number
+        font.drawCentered(batch, this.glyph, "$sum" , 0f, Constants.width, Constants.yTitleTableHead) // TODO Add word
         //TODO Internationalize Hunderter/Zehner/Einer
-        font.draw(batch, "$titleTable100Number Hunderter" , Constants.xTitleTable100, Constants.yTitlesTables)
-        font.draw(batch, "$titleTable10Number Zehner", Constants.xTitleTable10, Constants.yTitlesTables)
-        font.draw(batch, "$titleTable1Number Einer", Constants.xTitleTable1, Constants.yTitlesTables)
+        font.drawCentered(batch, this.glyph, "$titleTable100Number Hunderter" , 0f, Constants.firstLineBorderX, Constants.yTitlesTables)
+        font.drawCentered(batch, this.glyph, "$titleTable10Number Zehner" , Constants.firstLineBorderX, Constants.secondLineBorderX, Constants.yTitlesTables)
+        font.drawCentered(batch, this.glyph, "$titleTable1Number Einer" , Constants.secondLineBorderX, Constants.width, Constants.yTitlesTables)
+
         batch.end()
 
         val movingCirclesToDelete = arrayListOf<MovingCircle>() //Store all circles which are at endposition, because I cant remove while iterating over collection, is forbidden
@@ -250,4 +255,11 @@ fun List<Fixture>.getCirclesOfValue(num: Int, value: Int): List<Fixture>? {//Ret
         }
     }
     return null
+}
+
+fun BitmapFont.drawCentered(batch: SpriteBatch, glyph: GlyphLayout, s: String, xLeft: Float, xRight: Float, y:Float) {
+    glyph.setText(this, s)
+    val textWidth = glyph.width
+    val margin = (xRight-(xLeft + textWidth))/2
+    this.draw(batch, s, xLeft + margin, y)
 }

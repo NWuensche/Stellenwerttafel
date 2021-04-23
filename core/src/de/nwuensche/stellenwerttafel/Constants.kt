@@ -42,8 +42,6 @@ object Constants {
     val fontSize = (density * 35).toInt() //TODO End check emulator + Mama/Alex if this wors fine on other displays as well
     val scaleFont = 1f/Gdx.graphics.width - 1
 
-    val xTitleTable100 = width/10
-    val xTitleTable10 = (1f/3 * width) + xTitleTable100
-    val xTitleTable1 = (2f/3 * width) + xTitleTable100
     val yTitlesTables = 0.65f*firstLineBorderY
+    val yTitleTableHead = 0.3f* secondLineBorderY
 }
