@@ -62,7 +62,7 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
         val screenYNormalized = screenY * Constants.convertRatio
 
         if (dragState != DragState.DRAGCIRCLE) { // As long as not moved circle, create new one
-            createNewCircle(screenXNormalized, screenYNormalized)
+            createNewCircle(screenXNormalized, screenYNormalized, completelyNewSingleCircle = true)
         } else {
             //Moved Circle, update everything
             val oldValue = dragCircle!!.getValue()
@@ -100,11 +100,18 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
     }
 
     //Draw new Circle, add Box2D physics and add to list
-    fun createNewCircle(x: Float, y: Float) {
+    fun createNewCircle(x: Float, y: Float, completelyNewSingleCircle: Boolean = false) {
+        //When I move 100-circle to top border of 1-circle box, then most 1-circles get generated above border
+        //Thus, I have to 'get them back' with the coerceIn function and cannot remove them
+        //But when I add a single new circle, I don't want to allow to create any circle by pressing above header and want to remove them in this case
+        //Thus, I keep track with flag in which mode I currently am in and whether I can remove the new circle above header or move it down
+        if (completelyNewSingleCircle && y <=  Constants.firstLineBorderY) {
+            return
+        }
         //If I dont check this, then it can happen that when moving 100-circle fast to right/up/down border of 1-value that some circles are generated out of screen (can be seen when going back to 100)
         val x1 = x.coerceIn(Constants.widthCircleAndHitbox, Constants.width-Constants.widthCircleAndHitbox)
-        val y1 = y.coerceIn(Constants.widthCircleAndHitbox, Constants.height - Constants.widthCircleAndHitbox)
-
+        val y1 = y.coerceIn(Constants.firstLineBorderY + Constants.widthCircleAndHitbox, Constants.height - Constants.widthCircleAndHitbox)
+        //TODO Store State when pausing
         //Also check not inside hitbox of border, else it can happen that e.g. when putting 100-circle on border (to 10-circle) of 1-circle then some circles left and some right, but all green
         val x2 = when {
             (x1 >= Constants.firstLineBorderX - Constants.widthCircleAndHitbox) && (x1 <= Constants.firstLineBorderX) -> Constants.firstLineBorderX - Constants.widthCircleAndHitbox //In first hitbox, but closer to 100-box
@@ -112,11 +119,18 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
 
             (x1 >= Constants.secondLineBorderX - Constants.widthCircleAndHitbox) && (x1 <= Constants.secondLineBorderX) -> Constants.secondLineBorderX - Constants.widthCircleAndHitbox //In second hitbox, but closer to 10-box
             (x1 >= Constants.secondLineBorderX) && (x1 <= Constants.secondLineBorderX + Constants.widthCircleAndHitbox) -> Constants.secondLineBorderX + Constants.widthCircleAndHitbox //In second hitbox, but closer to 1-box
-            else -> x1 // No border-colision detected
+            else -> x1 // No border-collision detected
         }
         //TODO Alex was passiert mit Circlen wenn die über Header landen/liegen? gehen die da überhaupt hin mit drag? Oder werden die direkt gelöscht
-        val y2 = y1 //TODO Might need to also do this when lowering border-line top (not bottom, there physically not possible)
+        val y2 = y1 //INFO Dont need border thing like for x2 for y2, because coerceIn handles custom border
+        /*val y2 = when {
+            (y1 >= Constants.firstLineBorderY) && (y1 <= Constants.firstLineBorderY + Constants.widthCircleAndHitbox) -> Constants.firstLineBorderY + Constants.widthCircleAndHitbox //In y-hitbox, but closer to table
+ //           (y1 <= Constants.firstLineBorderY - Constants.widthCircleAndHitbox) && (y1 >= Constants.firstLineBorderY) -> Constants.firstLineBorderY + Constants.widthCircleAndHitbox //In y-hitbox, but closer to table
+ //           (y1 >= Constants.firstLineBorderY) && (y1 <= Constants.firstLineBorderY + Constants.widthCircleAndHitbox) -> Constants.firstLineBorderY + Constants.widthCircleAndHitbox //In y-hitbox, but closer to header TODO Remove Circle in this case
+            else -> y1 // No border-collision detected
+        }*/ //TODO Might need to also do this when lowering border-line top (not bottom, there physically not possible)
         circleDef.position.set(x2,y2)
+        //TODO I can create circles when pressing in header
         //TODO Einer/Zehner/... Locallisieren mit dem Unicode ICUJ Paket? Auch Zahlwörter?
         //TODO End auch Englische Beschreibung + Englischen Namen in Google Play Store
 
@@ -139,7 +153,7 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
             if((screenXNormalized- Constants.widthCircleAndHitbox >= 0) && (screenXNormalized + Constants.widthCircleAndHitbox <= Constants.width)){
                 newX = screenXNormalized
             }
-            if((screenYNormalized- Constants.widthCircleAndHitbox >= 0) && (screenYNormalized + Constants.widthCircleAndHitbox <= Constants.height)){
+            if((screenYNormalized- Constants.widthCircleAndHitbox >= Constants.firstLineBorderY) && (screenYNormalized + Constants.widthCircleAndHitbox <= Constants.height)){
                 newY = screenYNormalized
             }
             dragCircle!!.body.setTransform(newX, newY, 0f)

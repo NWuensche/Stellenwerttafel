@@ -55,7 +55,7 @@ class MyGdxGame : ApplicationAdapter() {
         groundBox.setAsBox(Constants.width, Constants.widthHitBoxBorders) //INFO Takes half values as inputs, but I want margin around drawn lines, so 'normal' is ok
         groundBody.createFixture(groundBox, 0.0f)
 
-        borderDef.position.set(Vector2(0f, 0f))
+        borderDef.position.set(Vector2(0f, Constants.firstLineBorderY))
         val ceilBody = world.createBody(borderDef)
         val ceilBox = PolygonShape()
         ceilBox.setAsBox(Constants.width, Constants.widthHitBoxBorders)
