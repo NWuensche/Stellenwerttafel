@@ -26,11 +26,8 @@ class Board(val sR: ShapeRenderer, val world: World) : Drawable {
         sR.drawLine(Vector2(0f, Constants.firstLineBorderY), Vector2(Constants.width, Constants.firstLineBorderY))
         sR.drawLine(Vector2(0f, Constants.secondLineBorderY), Vector2(Constants.width, Constants.secondLineBorderY))
 
+        sR.drawCircles { circles.forEach {sR.drawCircle(it)} }
 
-        circles.forEach {sR.drawCircle(it)}
-        for (it in movingCircles) {
-
-        }
         val movingCirclesToDelete = arrayListOf<MovingCircle>() //Store all circles which are at endposition, because I cant remove while iterating over collection, is forbidden
         movingCircles.forEach {
             val atEnd = it.drawAndFinished()
@@ -172,12 +169,17 @@ fun ShapeRenderer.drawLine(v1: Vector2, v2: Vector2) {
 
 fun ShapeRenderer.drawCircle(c: Fixture) {
     val pos = c.body.position
-    this.begin(ShapeRenderer.ShapeType.Filled)
     this.circle(pos.x,pos.y,Constants.radiusSprite,50) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
     this.color = c.getColor()
     this.circle(pos.x,pos.y,Constants.radiusSprite - (Constants.lineWidth * 0.5).toFloat(), 20) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
     this.color = Constants.lineColor
-    this.end() //TODO I should only open shaperenderer once, because explensive: https://stackoverflow.com/questions/29035553/trying-to-draw-a-circle-in-libgdx
+}
+
+//INFO I should only open shaperenderer once, because explensive, thus use that
+fun ShapeRenderer.drawCircles(f: () -> Unit) {
+    this.begin(ShapeRenderer.ShapeType.Filled)
+    f()
+    this.end()
 }
 
 //Return right color, depending on x-coordinate
