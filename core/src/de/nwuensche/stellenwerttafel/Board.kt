@@ -70,17 +70,17 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
         val sum = Constants.circle100Value * titleTable100Number + Constants.circle10Value * titleTable10Number + Constants.circle1Value * titleTable1Number
         val sumLocalizedText = MessageFormat.format("{0,spellout}", sum).replace(" ", "").replace("\u00AD", "").replace("-", "").capitalize() //replace '-' and unicode-version of '-' because zweihundert is actually 'zwei-hundert', same holds for ' ' in english
-        font.drawCentered(batch, this.glyph, "$sum = $sumLocalizedText", 0f, Constants.width, Constants.yTitleTableHead)
+        font.drawCentered(batch, this.glyph, "$sum = $sumLocalizedText", 0f, Constants.width, 0f, Constants.secondLineBorderY)
         font.color = if (titleTable100Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
 
-        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueHundreds", titleTable100Number), 0f, Constants.firstLineBorderX, Constants.yTitlesTables)
+        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueHundreds", titleTable100Number), 0f, Constants.firstLineBorderX, Constants.secondLineBorderY, Constants.firstLineBorderY)
         font.color = if (titleTable10Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
-        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueTens", titleTable10Number), Constants.firstLineBorderX, Constants.secondLineBorderX, Constants.yTitlesTables)
+        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueTens", titleTable10Number), Constants.firstLineBorderX, Constants.secondLineBorderX, Constants.secondLineBorderY, Constants.firstLineBorderY)
         font.color = if (titleTable1Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
-        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueOnes", titleTable1Number), Constants.secondLineBorderX, Constants.width, Constants.yTitlesTables)
+        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueOnes", titleTable1Number), Constants.secondLineBorderX, Constants.width, Constants.secondLineBorderY, Constants.firstLineBorderY)
 
         font.color = Constants.fontColorButton
-        font.drawCentered(batch, this.glyph, "\u00D7", Constants.buttonX, Constants.buttonX + Constants.buttonWidth, Constants.buttonY + 0.5f*Constants.buttonHeight - 0.00025f*Constants.fontSize)
+        font.drawCentered(batch, this.glyph, "\u00D7", Constants.buttonX, Constants.buttonX + Constants.buttonWidth, Constants.buttonY, Constants.buttonY+Constants.buttonHeight)
 
         font.color = Constants.lineColor
         batch.end()
@@ -303,9 +303,14 @@ fun List<Fixture>.getCirclesOfValue(num: Int, value: Int): List<Fixture>? {//Ret
     return null
 }
 
-fun BitmapFont.drawCentered(batch: SpriteBatch, glyph: GlyphLayout, s: String, xLeft: Float, xRight: Float, y: Float) {
+fun BitmapFont.drawCentered(batch: SpriteBatch, glyph: GlyphLayout, s: String, xLeft: Float, xRight: Float, yUp: Float, yDown: Float) {
     glyph.setText(this, s)
+
     val textWidth = glyph.width
-    val margin = (xRight-(xLeft + textWidth))/2
-    this.draw(batch, s, xLeft + margin, y)
+    val marginX = (xRight-(xLeft + textWidth))/2
+
+    val textHeight = glyph.height
+    val marginY = (yDown-(yUp + textHeight))/2
+
+    this.draw(batch, s, xLeft + marginX, yUp + marginY)
 }

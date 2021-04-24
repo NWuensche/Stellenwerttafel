@@ -47,13 +47,10 @@ object Constants {
     val fontSize = (density * 35).toInt() //TODO End check emulator + Mama/Alex if this wors fine on other displays as well
     val scaleFont = 1f/Gdx.graphics.width - 1
 
-    val yTitlesTables = 0.65f*firstLineBorderY
-    val yTitleTableHead = 0.3f* secondLineBorderY
-
     //delete button dimensions
     val buttonX = 0.9f * width
     val buttonY = lineWidth
     val buttonWidth = width - (buttonX + lineWidth)
-    val buttonHeight = Constants.secondLineBorderY - Constants.yTitleTableHead
+    val buttonHeight = secondLineBorderY - 2.5f*lineWidth //INFO .5 because of linewidth of secondLineBorderY, so that margin top and bottom of button are same height
     val buttonCornerRadius = 0.005f
 }
