@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.*
 import com.badlogic.gdx.utils.I18NBundle
 import com.ibm.icu.text.MessageFormat
 import java.util.*
+import kotlin.random.Random
 
 
 //batch only used for text
@@ -164,7 +165,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
         //Check if delete Button Pressed
         if (containedInRect(screenXNormalized, screenYNormalized, Constants.buttonX, Constants.buttonY, Constants.buttonX+Constants.buttonWidth, Constants.buttonY+Constants.buttonHeight)) {
-            titleTable100Number = 1000
+            deleteAllCircles()
         }
 
         //Dont need to handle touchUp when pressing button, because I ignore touchUp in header
@@ -174,6 +175,29 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         titleTable100Number = circles.filter{it.getColor() == Constants.circle100Color}.size
         titleTable10Number = circles.filter{it.getColor() == Constants.circle10Color}.size
         titleTable1Number = circles.filter{it.getColor() == Constants.circle1Color}.size
+    }
+
+    //Remove all box2d boxes from circles, make circles fly in random directions
+    fun deleteAllCircles() {
+        for (circle in circles) {
+            //random which border the circle flyies to, Other value is random
+            val whichOneIsBorder = Random.Default.nextInt(4) //4 non-inclusive
+            val offset = 0.1f //Add to coordinates so that flying circle already offscreen when it gets destroyed
+            val endX = when(whichOneIsBorder) {
+                0 -> -offset
+                1 -> Constants.width + offset
+                else -> Random.Default.nextFloat() * Constants.width //Normalize
+            }
+            val endY = when(whichOneIsBorder) {
+                2 -> -offset
+                3 -> Constants.height + offset
+                else -> Random.Default.nextFloat() * Constants.height //Normalize
+            }
+            //copy position vector, because else would also be destroyed
+            flyingCircles.add(FlyingCircle(circle.body.position.copy(), Vector2(endX, endY), circle.getColor(), sR))
+            circle.destroy()
+        }
+        circles.clear() // Last, because cant remove while iterating over list
     }
 
     //Draw new Circle, add Box2D physics and add to list
