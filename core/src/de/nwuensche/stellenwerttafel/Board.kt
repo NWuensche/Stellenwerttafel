@@ -39,7 +39,8 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
     override fun draw() {
         drawGrid()
-        drawTexts()
+        drawDeleteButton()
+        drawTexts() //Text on top of button
 
         sR.drawCircles { circles.forEach {sR.drawCircle(it)} } // Draw 'normal' circles
         drawAndHandleFlyingCircles()
@@ -66,17 +67,27 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
     private fun drawTexts() {
         batch.begin()
+
         val sum = Constants.circle100Value * titleTable100Number + Constants.circle10Value * titleTable10Number + Constants.circle1Value * titleTable1Number
         val sumLocalizedText = MessageFormat.format("{0,spellout}", sum).replace(" ", "").replace("\u00AD", "").replace("-", "").capitalize() //replace '-' and unicode-version of '-' because zweihundert is actually 'zwei-hundert', same holds for ' ' in english
         font.drawCentered(batch, this.glyph, "$sum = $sumLocalizedText", 0f, Constants.width, Constants.yTitleTableHead)
         font.color = if (titleTable100Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
+
         font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueHundreds", titleTable100Number), 0f, Constants.firstLineBorderX, Constants.yTitlesTables)
         font.color = if (titleTable10Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
         font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueTens", titleTable10Number), Constants.firstLineBorderX, Constants.secondLineBorderX, Constants.yTitlesTables)
         font.color = if (titleTable1Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
         font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueOnes", titleTable1Number), Constants.secondLineBorderX, Constants.width, Constants.yTitlesTables)
+
+        font.color = Constants.fontColorButton
+        font.drawCentered(batch, this.glyph, "\u00D7", Constants.buttonX, Constants.buttonX + Constants.buttonWidth, Constants.buttonY + 0.5f*Constants.buttonHeight - 0.00025f*Constants.fontSize)
+
         font.color = Constants.lineColor
         batch.end()
+    }
+
+    fun drawDeleteButton() {
+        sR.drawRoundedRect(Constants.buttonX, Constants.buttonY, Constants.buttonWidth, Constants.buttonHeight, Constants.buttonCornerRadius)
     }
 
     //TODO End refactor long methods
@@ -233,6 +244,26 @@ fun ShapeRenderer.drawCircle(c: Fixture) {
 fun ShapeRenderer.drawCircles(f: () -> Unit) {
     this.begin(ShapeRenderer.ShapeType.Filled)
     f()
+    this.end()
+}
+
+//Credit to https://gamedev.stackexchange.com/a/118396
+fun ShapeRenderer.drawRoundedRect(x: Float, y: Float, width: Float, height: Float, radius: Float) {
+    // Central rectangle
+    this.begin(ShapeRenderer.ShapeType.Filled) //INFO Need filled, else would see too many Lines
+    this.rect(x + radius, y + radius, width - 2 * radius, height - 2 * radius)
+
+    // Four side rectangles, in clockwise order
+    this.rect(x + radius, y, width - 2 * radius, radius)
+    this.rect(x + width - radius, y + radius, radius, height - 2 * radius)
+    this.rect(x + radius, y + height - radius, width - 2 * radius, radius)
+    this.rect(x, y + radius, radius, height - 2 * radius)
+
+    // Four arches, clockwise too
+    this.arc(x + radius, y + radius, radius, 180f, 90f)
+    this.arc(x + width - radius, y + radius, radius, 270f, 90f)
+    this.arc(x + width - radius, y + height - radius, radius, 0f, 90f)
+    this.arc(x + radius, y + height - radius, radius, 90f, 90f)
     this.end()
 }
 

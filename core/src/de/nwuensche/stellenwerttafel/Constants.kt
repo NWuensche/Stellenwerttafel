@@ -16,10 +16,13 @@ object Constants {
     val secondLineBorderY = height/8f
 
 
+
+
     //TODO Relative to width? Check with emulator + Other smartphones like Alex
     val lineWidthOriginal = 10f //Only use this to set line width for ShapeRenderer, for everything else use other lineWidth
 
     val lineWidth = 10f * convertRatio
+
     val radiusSprite = 50f * convertRatio //Radius for drawn circle
     val radiusHitBox = 20f * convertRatio //Radius for box2d box circle, has to be smaller because otherwise 100 1-circles wobble too much
     val marginCircle = radiusSprite - radiusHitBox
@@ -31,6 +34,7 @@ object Constants {
     val speedFactor = 2 //Move circle in 1/x seconds
 
     val lineColor = Color.BLACK
+    val fontColorButton = Color.WHITE
     val overflowColor = Color.RED // Color when e.g. 11 tens or 10 ones
     val circle100Color = Color.RED
     val circle10Color = Color.BLUE
@@ -45,4 +49,11 @@ object Constants {
 
     val yTitlesTables = 0.65f*firstLineBorderY
     val yTitleTableHead = 0.3f* secondLineBorderY
+
+    //delete button dimensions
+    val buttonX = 0.9f * width
+    val buttonY = lineWidth
+    val buttonWidth = width - (buttonX + lineWidth)
+    val buttonHeight = Constants.secondLineBorderY - Constants.yTitleTableHead
+    val buttonCornerRadius = 0.005f
 }
