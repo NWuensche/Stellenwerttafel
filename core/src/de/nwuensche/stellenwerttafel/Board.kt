@@ -71,7 +71,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
         val sum = Constants.circle100Value * titleTable100Number + Constants.circle10Value * titleTable10Number + Constants.circle1Value * titleTable1Number
         val sumLocalizedText = MessageFormat.format("{0,spellout}", sum).replace(" ", "").replace("\u00AD", "").replace("-", "").capitalize() //replace '-' and unicode-version of '-' because zweihundert is actually 'zwei-hundert', same holds for ' ' in english
-        font.drawCentered(batch, this.glyph, "$sum = $sumLocalizedText", 0f, Constants.width, 0f, Constants.secondLineBorderY)
+        font.drawCentered(batch, this.glyph, "$sum = $sumLocalizedText", 0f, Constants.width, 0f, Constants.secondLineBorderY) //INFO Does not look good when xRight=ButtonX
         font.color = if (titleTable100Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
 
         font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueHundreds", titleTable100Number), 0f, Constants.firstLineBorderX, Constants.secondLineBorderY, Constants.firstLineBorderY)
@@ -221,7 +221,6 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
             (x1 >= Constants.secondLineBorderX) && (x1 <= Constants.secondLineBorderX + Constants.widthCircleAndHitbox) -> Constants.secondLineBorderX + Constants.widthCircleAndHitbox //In second hitbox, but closer to 1-box
             else -> x1 // No border-collision detected
         }
-        //TODO Text Head Sum mit neuem x value mit Knopf anpassen
         //TODO Alex was passiert mit Circlen wenn die über Header landen/liegen? gehen die da überhaupt hin mit drag? Oder werden die direkt gelöscht
         val y2 = y1 //INFO Dont need border thing like for x2 for y2, because coerceIn handles custom border (+  not bottom, there physically not possible)
         circleDef.position.set(x2, y2)

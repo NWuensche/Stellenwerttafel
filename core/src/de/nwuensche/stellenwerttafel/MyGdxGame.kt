@@ -55,7 +55,6 @@ class MyGdxGame : ApplicationAdapter() {
         Gdx.input.inputProcessor = object : InputAdapter() {
             //TODO Remove circle when moved top Alex geht das nur wenn beschleunigt nach oben kommen, oder auch wenn ganz langsam?
             override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-                //TODO Interssting for buttons (img.getBoundingRectangle().contains(screenX, screenY)) println("Image Clicked")
                 board.touchUp(screenX, screenY, pointer, button) //TODO Alex ist das touchUp oder touchDown?
                 //TODO Alex Touch Drag auf nichts erstellt am Ende auch Button oder nicht? oder vielleicht sogar am Anfang?
                 return true
