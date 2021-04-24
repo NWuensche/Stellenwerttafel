@@ -158,6 +158,24 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         titleTable1Number = circles.filter{it.getColor() == Constants.circle1Color}.size
     }
 
+    fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int) {
+        val screenXNormalized = screenX * Constants.convertRatio
+        val screenYNormalized = screenY * Constants.convertRatio
+
+        //Check if delete Button Pressed
+        if (containedInRect(screenXNormalized, screenYNormalized, Constants.buttonX, Constants.buttonY, Constants.buttonX+Constants.buttonWidth, Constants.buttonY+Constants.buttonHeight)) {
+            titleTable100Number = 1000
+        }
+
+        //Dont need to handle touchUp when pressing button, because I ignore touchUp in header
+
+        //update counter
+        //TODO Could be faster by traversing only once
+        titleTable100Number = circles.filter{it.getColor() == Constants.circle100Color}.size
+        titleTable10Number = circles.filter{it.getColor() == Constants.circle10Color}.size
+        titleTable1Number = circles.filter{it.getColor() == Constants.circle1Color}.size
+    }
+
     //Draw new Circle, add Box2D physics and add to list
     fun createNewCircle(x: Float, y: Float, completelyNewSingleCircle: Boolean = false) {
         //When I move 100-circle to top border of 1-circle box, then most 1-circles get generated above border
@@ -211,11 +229,8 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
             return
         }
         
-        for (circle in circles.asReversed()) { //TODO Might be slow, because really reverse list
-            if (((circle.body.position.x - Constants.radiusSprite) <= screenXNormalized)
-                    && (screenXNormalized <= (circle.body.position.x + Constants.radiusSprite))
-                    && ((circle.body.position.y - Constants.radiusSprite) <= screenYNormalized)
-                    && (screenYNormalized <= (circle.body.position.y + Constants.radiusSprite))) {
+        for (circle in circles.asReversed()) { //TODO Might be slow, because really reverse list, TODO Cant reverse list, because then drawing is inside-out (highest circle is below all others - TODO DoubleLinkedList?
+            if (containedInCircle(screenXNormalized, screenYNormalized, circle.body.position.x, circle.body.position.y, Constants.radiusSprite)) {
                 dragCircle = circle
                 dragStartPosition = circle.body.position.copy() // Without copy will be changed whole time
                 dragStartColor = circle.getColor()
@@ -223,6 +238,19 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
             }
         }
         dragState = if (dragCircle != null) DragState.DRAGCIRCLE else DragState.DRAGNOTHING
+    }
+
+    //Returns True iff inX/inY Point inside circle (containemt includes border)
+    fun containedInCircle(inX: Float, inY: Float, mX: Float, mY: Float, radius: Float): Boolean {
+        return containedInRect(inX, inY, mX-radius, mY-radius, mX+radius, mY+radius)
+    }
+
+    //Returns True iff inX/inY Point inside rectangle (containemt includes border)
+    fun containedInRect(inX: Float, inY: Float, rectTopLeftX: Float, rectTopLeftY: Float, rectBottomRightX: Float, rectBottomRightY: Float): Boolean {
+        return (rectTopLeftX <= inX)
+                && (inX <= rectBottomRightX)
+                && (rectTopLeftY <= inY)
+                && (inY <= rectBottomRightY)
     }
 }
 

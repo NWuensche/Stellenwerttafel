@@ -61,6 +61,11 @@ class MyGdxGame : ApplicationAdapter() {
                 return true
             }
 
+            override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+                board.touchDown(screenX, screenY, pointer, button)
+                return true
+            }
+
             override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
                 board.touchDragged(screenX, screenY, pointer) //TODO Alex ist das touchUp oder touchDown?
                 return true
