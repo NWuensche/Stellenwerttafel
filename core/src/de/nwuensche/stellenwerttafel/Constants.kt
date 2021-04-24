@@ -19,6 +19,8 @@ object Constants {
 
 
     //TODO Relative to width? Check with emulator + Other smartphones like Alex
+    //TODO radius 2x basierend auf density
+    val density = Gdx.graphics.density
     val lineWidthOriginal = 10f //Only use this to set line width for ShapeRenderer, for everything else use other lineWidth
 
     val lineWidth = 10f * convertRatio
@@ -43,7 +45,6 @@ object Constants {
     val circle10Value = 10
     val circle1Value = 1
 
-    val density = Gdx.graphics.density
     val fontSize = (density * 35).toInt() //TODO End check emulator + Mama/Alex if this wors fine on other displays as well
     val scaleFont = 1f/Gdx.graphics.width - 1
 
