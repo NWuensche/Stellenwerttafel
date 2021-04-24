@@ -16,7 +16,7 @@ import java.util.*
 //batch only used for text
 class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val font: BitmapFont) : Drawable {
     val circles = arrayListOf<Fixture>()
-    val movingCircles: MutableList<MovingCircle> = arrayListOf()
+    val flyingCircles: MutableList<FlyingCircle> = arrayListOf()
     var titleTable100Number = 0 // Updating string also updates text on screen automatically
     var titleTable10Number = 0
     var titleTable1Number = 0
@@ -35,48 +35,58 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
     var dragStartPosition: Vector2? = null
     var dragCircle: Fixture? = null
     var dragStartColor: Color? = null // Will for jump back circles be overwritten, so store it first
+    //TODO END also name app English when uploading english version
 
     override fun draw() {
+        drawGrid()
+        drawTexts()
+
+        sR.drawCircles { circles.forEach {sR.drawCircle(it)} } // Draw 'normal' circles
+        drawAndHandleFlyingCircles()
+
+    }
+
+    //draw flying circles (without box2d box) + remove them when they are at goal and shall be removed
+    private fun drawAndHandleFlyingCircles() {
+        val flyingCirclesToDelete = arrayListOf<FlyingCircle>() //Store all circles which are at endposition, because I cant remove while iterating over collection, is forbidden
+        flyingCircles.forEach {
+            val atEnd = it.drawAndFinished()
+            if (atEnd) {
+                flyingCirclesToDelete.add(it)
+            }
+        }
+        //INFO Dont clear all flying circles once one is at goal, could do two seperate movements at once
+        flyingCirclesToDelete.forEach {
+            if (it.keep) { //Create new circle with physics (used when jump back circle)
+                createNewCircle(it.endPosition.x, it.endPosition.y)
+            }
+            flyingCircles.remove(it)
+        }
+    }
+
+    private fun drawTexts() {
+        batch.begin()
+        val sum = Constants.circle100Value * titleTable100Number + Constants.circle10Value * titleTable10Number + Constants.circle1Value * titleTable1Number
+        val sumLocalizedText = MessageFormat.format("{0,spellout}", sum).replace(" ", "").replace("\u00AD", "").replace("-", "").capitalize() //replace '-' and unicode-version of '-' because zweihundert is actually 'zwei-hundert', same holds for ' ' in english
+        font.drawCentered(batch, this.glyph, "$sum = $sumLocalizedText", 0f, Constants.width, Constants.yTitleTableHead)
+        font.color = if (titleTable100Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
+        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueHundreds", titleTable100Number), 0f, Constants.firstLineBorderX, Constants.yTitlesTables)
+        font.color = if (titleTable10Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
+        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueTens", titleTable10Number), Constants.firstLineBorderX, Constants.secondLineBorderX, Constants.yTitlesTables)
+        font.color = if (titleTable1Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
+        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueOnes", titleTable1Number), Constants.secondLineBorderX, Constants.width, Constants.yTitlesTables)
+        font.color = Constants.lineColor
+        batch.end()
+    }
+
+    //TODO End refactor long methods
+
+    private fun drawGrid() {
         sR.drawLine(Vector2(Constants.firstLineBorderX, Constants.secondLineBorderY), Vector2(Constants.firstLineBorderX, Constants.height))
         sR.drawLine(Vector2(Constants.secondLineBorderX, Constants.secondLineBorderY), Vector2(Constants.secondLineBorderX, Constants.height))
 
         sR.drawLine(Vector2(0f, Constants.firstLineBorderY), Vector2(Constants.width, Constants.firstLineBorderY))
         sR.drawLine(Vector2(0f, Constants.secondLineBorderY), Vector2(Constants.width, Constants.secondLineBorderY))
-
-        sR.drawCircles { circles.forEach {sR.drawCircle(it)} }
-        //TODO END also name app English when uploading english version
-        //TODO Store circle throguh app pause
-
-        batch.begin()
-            val sum = Constants.circle100Value*titleTable100Number + Constants.circle10Value*titleTable10Number + Constants.circle1Value*titleTable1Number
-            val sumLocalizedText = MessageFormat.format("{0,spellout}", sum).replace(" ", "").replace("\u00AD", "").replace("-", "").capitalize() //replace '-' and unicode-version of '-' because zweihundert is actually 'zwei-hundert', same holds for ' ' in english
-            font.drawCentered(batch, this.glyph, "$sum = $sumLocalizedText", 0f, Constants.width, Constants.yTitleTableHead)
-            font.color = if (titleTable100Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
-            font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueHundreds", titleTable100Number), 0f, Constants.firstLineBorderX, Constants.yTitlesTables)
-            font.color = if (titleTable10Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
-            font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueTens", titleTable10Number), Constants.firstLineBorderX, Constants.secondLineBorderX, Constants.yTitlesTables)
-            font.color = if (titleTable1Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
-            font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueOnes", titleTable1Number), Constants.secondLineBorderX, Constants.width, Constants.yTitlesTables)
-            font.color = Constants.lineColor
-        batch.end()
-
-        val movingCirclesToDelete = arrayListOf<MovingCircle>() //Store all circles which are at endposition, because I cant remove while iterating over collection, is forbidden
-        movingCircles.forEach {
-            val atEnd = it.drawAndFinished()
-            if (atEnd) {
-                movingCirclesToDelete.add(it)
-            }
-        }
-        movingCirclesToDelete.forEach {
-            if (it.keep) { //Create new circle with physics (used when jump back circle)
-                createNewCircle(it.endPosition.x, it.endPosition.y)
-            }
-            movingCircles.remove(it)
-        }
-
-        //INFO Filter out the ones which are finished
-        //INFO Dont clear all, could do two seperate movements at once
-        //movingCircles = movingCircles.filter {it.stillMoving}.toMutableList() //TODO Might be very time/space consuming
     }
 
 
@@ -112,12 +122,12 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
                 val circlesToRemove = circles.getCirclesOfValue(numCirclesToRemove, oldValue)
                 //INFO Don't want that moving circle collides with anything, so remove its fixture/body first
                 if (circlesToRemove == null) {
-                    movingCircles.add(MovingCircle(dragCircle!!.body.position, dragStartPosition!!, dragStartColor!!, sR, keep = true))
+                    flyingCircles.add(FlyingCircle(dragCircle!!.body.position, dragStartPosition!!, dragStartColor!!, sR, keep = true))
                     circles.remove(dragCircle!!)
                     dragCircle!!.destroy()
                 }
                 circlesToRemove?.forEach {
-                    movingCircles.add(MovingCircle(it.body.position, Vector2(screenXNormalized, screenYNormalized), it.getColor(), sR))
+                    flyingCircles.add(FlyingCircle(it.body.position, Vector2(screenXNormalized, screenYNormalized), it.getColor(), sR))
                     circles.remove(it)
                     it.destroy() //INFO Needed, else still lag although moved circles from 1 to 100
                 }
@@ -149,7 +159,6 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         //If I dont check this, then it can happen that when moving 100-circle fast to right/up/down border of 1-value that some circles are generated out of screen (can be seen when going back to 100)
         val x1 = x.coerceIn(Constants.widthCircleAndHitbox, Constants.width - Constants.widthCircleAndHitbox)
         val y1 = y.coerceIn(Constants.firstLineBorderY + Constants.widthCircleAndHitbox, Constants.height - Constants.widthCircleAndHitbox)
-        //TODO Store State when pausing
         //Also check not inside hitbox of border, else it can happen that e.g. when putting 100-circle on border (to 10-circle) of 1-circle then some circles left and some right, but all green
         val x2 = when {
             (x1 >= Constants.firstLineBorderX - Constants.widthCircleAndHitbox) && (x1 <= Constants.firstLineBorderX) -> Constants.firstLineBorderX - Constants.widthCircleAndHitbox //In first hitbox, but closer to 100-box
@@ -159,17 +168,10 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
             (x1 >= Constants.secondLineBorderX) && (x1 <= Constants.secondLineBorderX + Constants.widthCircleAndHitbox) -> Constants.secondLineBorderX + Constants.widthCircleAndHitbox //In second hitbox, but closer to 1-box
             else -> x1 // No border-collision detected
         }
+        //TODO Text Head Sum mit neuem x value mit Knopf anpassen
         //TODO Alex was passiert mit Circlen wenn die über Header landen/liegen? gehen die da überhaupt hin mit drag? Oder werden die direkt gelöscht
-        val y2 = y1 //INFO Dont need border thing like for x2 for y2, because coerceIn handles custom border
-        /*val y2 = when {
-            (y1 >= Constants.firstLineBorderY) && (y1 <= Constants.firstLineBorderY + Constants.widthCircleAndHitbox) -> Constants.firstLineBorderY + Constants.widthCircleAndHitbox //In y-hitbox, but closer to table
- //           (y1 <= Constants.firstLineBorderY - Constants.widthCircleAndHitbox) && (y1 >= Constants.firstLineBorderY) -> Constants.firstLineBorderY + Constants.widthCircleAndHitbox //In y-hitbox, but closer to table
- //           (y1 >= Constants.firstLineBorderY) && (y1 <= Constants.firstLineBorderY + Constants.widthCircleAndHitbox) -> Constants.firstLineBorderY + Constants.widthCircleAndHitbox //In y-hitbox, but closer to header TODO Remove Circle in this case
-            else -> y1 // No border-collision detected
-        }*/ //TODO Might need to also do this when lowering border-line top (not bottom, there physically not possible)
+        val y2 = y1 //INFO Dont need border thing like for x2 for y2, because coerceIn handles custom border (+  not bottom, there physically not possible)
         circleDef.position.set(x2, y2)
-        //TODO I can create circles when pressing in header
-        //TODO Einer/Zehner/... Locallisieren mit dem Unicode ICUJ Paket? Auch Zahlwörter?
         //TODO End auch Englische Beschreibung + Englischen Namen in Google Play Store
 
         val body = world.createBody(circleDef)

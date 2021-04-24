@@ -22,7 +22,16 @@ class MyGdxGame : ApplicationAdapter() {
                 .apply { projectionMatrix = camera.combined }
     }
     val batch: SpriteBatch by lazy {SpriteBatch().apply { projectionMatrix = camera.combined }} //INFO Used only for text
-    lateinit var font: BitmapFont //TODO Lazy
+    val font: BitmapFont by lazy {
+        val fontGenerator = FreeTypeFontGenerator(Gdx.files.internal("fonts/liberationsans.ttf"))
+        val font = createFont(fontGenerator, Constants.fontSize).apply {
+            color = Constants.lineColor
+            data.scale(Constants.scaleFont)
+            setUseIntegerPositions(false) //Else font not visible in small box2d setting with float coordinates + not crisp
+        }
+        fontGenerator.dispose()
+        font
+    }
     //INFO Setting doSleep=false makes movement of other circles while dragging better, and both true/false lag when 200 1-values
     //INFO Furthermore, when doSleep=false no problem with possibility of putting circle directly on boarder and keeping it there
     val world: World by lazy { World(Vector2(0f, 0f), false) } //First is gravity vector, second is CPU optimization on
@@ -58,13 +67,7 @@ class MyGdxGame : ApplicationAdapter() {
             }
         }
 
-        val fontGenerator = FreeTypeFontGenerator(Gdx.files.internal("fonts/liberationsans.ttf"))
-        font = createFont(fontGenerator, Constants.fontSize).apply {
-            color = Constants.lineColor
-            data.scale(Constants.scaleFont)
-            setUseIntegerPositions(false) //Else font not visible in small box2d setting with float coordinates + not crisp
-        }
-        fontGenerator.dispose()
+
 
         createBordersBox2D() // Should be after drawing all graphics, else could get out of sync
     }
@@ -132,5 +135,8 @@ class MyGdxGame : ApplicationAdapter() {
 
     override fun dispose() {
         sR.dispose()
+        batch.dispose()
+        font.dispose()
+        world.dispose()
     }
 }
