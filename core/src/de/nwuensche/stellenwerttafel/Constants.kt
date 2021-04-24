@@ -31,6 +31,7 @@ object Constants {
     val speedFactor = 2 //Move circle in 1/x seconds
 
     val lineColor = Color.BLACK
+    val overflowColor = Color.RED // Color when e.g. 11 tens or 10 ones
     val circle100Color = Color.RED
     val circle10Color = Color.BLUE
     val circle1Color = Color.GREEN

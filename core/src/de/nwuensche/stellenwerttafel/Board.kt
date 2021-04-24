@@ -45,15 +45,19 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
         sR.drawCircles { circles.forEach {sR.drawCircle(it)} }
         //TODO END also name app English when uploading english version
-        batch.begin()
-        val sum = Constants.circle100Value*titleTable100Number + Constants.circle10Value*titleTable10Number + Constants.circle1Value*titleTable1Number
-        val sumLocalizedText = MessageFormat.format("{0,spellout}", sum).replace(" ", "").replace("\u00AD", "").replace("-", "").capitalize() //replace '-' and unicode-version of '-' because zweihundert is actually 'zwei-hundert', same holds for ' ' in english
-        font.drawCentered(batch, this.glyph, "$sum = $sumLocalizedText", 0f, Constants.width, Constants.yTitleTableHead) // TODO Add word
-        //TODO Internationalize Hunderter/Zehner/Einer
-        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueHundreds", titleTable100Number), 0f, Constants.firstLineBorderX, Constants.yTitlesTables)
-        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueTens", titleTable10Number), Constants.firstLineBorderX, Constants.secondLineBorderX, Constants.yTitlesTables)
-        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueOnes", titleTable1Number), Constants.secondLineBorderX, Constants.width, Constants.yTitlesTables)
+        //TODO Store circle throguh app pause
 
+        batch.begin()
+            val sum = Constants.circle100Value*titleTable100Number + Constants.circle10Value*titleTable10Number + Constants.circle1Value*titleTable1Number
+            val sumLocalizedText = MessageFormat.format("{0,spellout}", sum).replace(" ", "").replace("\u00AD", "").replace("-", "").capitalize() //replace '-' and unicode-version of '-' because zweihundert is actually 'zwei-hundert', same holds for ' ' in english
+            font.drawCentered(batch, this.glyph, "$sum = $sumLocalizedText", 0f, Constants.width, Constants.yTitleTableHead)
+            font.color = if (titleTable100Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
+            font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueHundreds", titleTable100Number), 0f, Constants.firstLineBorderX, Constants.yTitlesTables)
+            font.color = if (titleTable10Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
+            font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueTens", titleTable10Number), Constants.firstLineBorderX, Constants.secondLineBorderX, Constants.yTitlesTables)
+            font.color = if (titleTable1Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
+            font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueOnes", titleTable1Number), Constants.secondLineBorderX, Constants.width, Constants.yTitlesTables)
+            font.color = Constants.lineColor
         batch.end()
 
         val movingCirclesToDelete = arrayListOf<MovingCircle>() //Store all circles which are at endposition, because I cant remove while iterating over collection, is forbidden
