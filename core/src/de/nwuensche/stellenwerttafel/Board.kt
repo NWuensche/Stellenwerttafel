@@ -30,9 +30,10 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
     private enum class DragState {
         NONE, //Not in dragged state
         DRAGCIRCLE, // dragged, and first touch on a circle
-        DRAGNOTHING // dragged, but first touch on nothing
+        DRAGNOTHING // dragged, but first touch in header
     }
     private var dragState = DragState.NONE
+    //TODO Could be properties of sealed class + use `when`
     var dragStartPosition: Vector2? = null
     var dragCircle: Fixture? = null
     var dragStartColor: Color? = null // Will for jump back circles be overwritten, so store it first
@@ -124,10 +125,8 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
 
 
-        if (dragState != DragState.DRAGCIRCLE) { // As long as not moved circle, create new one
-            createNewCircle(screenXNormalized, screenYNormalized, completelyNewSingleCircle = true)
-        } else {
-            //Moved Circle out of table into header, either fly back or delete
+        if (dragState == DragState.DRAGCIRCLE) {
+
             if (dragCircle!!.body.position.y <= Constants.firstLineBorderY) { // Above first line -> In Header
                 if (dragCircle!!.body.position.y >= Constants.secondLineBorderY) { // Above first line and below second line -> fly back
                     flyingCircles.add(FlyingCircle(dragCircle!!.body.position.copy(), dragStartPosition!!, dragStartColor!!, sR, keep = true))
@@ -169,7 +168,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
             }
         }
 
-        //reset
+        //reset (also needed when dragged in header, thus DRAGGEDNOTHING)
         dragCircle = null
         dragState = DragState.NONE
         dragStartPosition = null
@@ -199,6 +198,28 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
         //Dont need to handle touchUp when pressing button, because I ignore touchUp in header
 
+        //Either drag circle or create new one and drag this one (like in app)
+        for (circle in circles.asReversed()) { //TODO Might be slow, because really reverse list, TODO Cant reverse list, because then drawing is inside-out (highest circle is below all others - TODO DoubleLinkedList?
+            if (containedInCircle(screenXNormalized, screenYNormalized, circle.body.position.x, circle.body.position.y, Constants.radiusSprite)) {
+                dragState = DragState.DRAGCIRCLE
+                dragCircle = circle
+                dragStartPosition = circle.body.position.copy() // Without copy will be changed whole time
+                dragStartColor = circle.getColor()
+                break
+            }
+        }
+        if (dragState == DragState.NONE) { // Nothing dragged, thus create new circle and drag it
+            val newCircle = createNewCircle(screenXNormalized, screenYNormalized, completelyNewSingleCircle = true)
+            if (newCircle != null) {
+                dragState = DragState.DRAGCIRCLE
+                dragCircle = newCircle
+                dragStartPosition = newCircle.body.position.copy()
+                dragStartColor = newCircle.getColor()
+            } else {
+                dragState = DragState.DRAGNOTHING
+            }
+        }
+
         updateTableCounters()
         //TODO Alex Dialogbox für Anzahl Spalten jedes Mal bei Start?
     }
@@ -226,13 +247,14 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
     }
 
     //Draw new Circle, add Box2D physics and add to list
-    fun createNewCircle(x: Float, y: Float, completelyNewSingleCircle: Boolean = false) {
+    //Return new circle because I need it when I drag it (could be null when started drag in header
+    fun createNewCircle(x: Float, y: Float, completelyNewSingleCircle: Boolean = false): Fixture? {
         //When I move 100-circle to top border of 1-circle box, then most 1-circles get generated above border
         //Thus, I have to 'get them back' with the coerceIn function and cannot remove them
         //But when I add a single new circle, I don't want to allow to create any circle by pressing above header and want to remove them in this case
         //Thus, I keep track with flag in which mode I currently am in and whether I can remove the new circle above header or move it down
         if (completelyNewSingleCircle && y <=  Constants.firstLineBorderY) {
-            return
+            return null
         }
         //If I dont check this, then it can happen that when moving 100-circle fast to right/up/down border of 1-value that some circles are generated out of screen (can be seen when going back to 100)
         val x1 = x.coerceIn(Constants.widthCircleAndHitbox, Constants.width - Constants.widthCircleAndHitbox)
@@ -257,38 +279,31 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         val fixture = body.createFixture(fixtureDef)
         fixture.updateColor()
         circles.add(fixture)
+        return fixture
     }
 
     fun touchDragged(screenX: Int, screenY: Int, pointer: Int) {
         val screenXNormalized = screenX * Constants.convertRatio
         val screenYNormalized = screenY * Constants.convertRatio
 
-        if (dragCircle != null) {
+        if (dragCircle != null) { //TODO Check drag State
             //INFO Moving on e.g. y axis ok, even if at border of y axis, so compute both seperately
             var newX = dragCircle!!.body.position.x
             var newY = dragCircle!!.body.position.y
-            if((screenXNormalized- Constants.widthCircleAndHitbox >= 0) && (screenXNormalized + Constants.widthCircleAndHitbox <= Constants.width)){
+            if ((screenXNormalized - Constants.widthCircleAndHitbox >= 0) && (screenXNormalized + Constants.widthCircleAndHitbox <= Constants.width)) {
                 newX = screenXNormalized
             }
 
             //Ok to go out of screen at top, because then circle will be deleted
             //if((screenYNormalized- Constants.widthCircleAndHitbox >= Constants.firstLineBorderY) && (screenYNormalized + Constants.widthCircleAndHitbox <= Constants.height)){
-            if(screenYNormalized + Constants.widthCircleAndHitbox <= Constants.height){
+            if (screenYNormalized + Constants.widthCircleAndHitbox <= Constants.height) {
                 newY = screenYNormalized
             }
             dragCircle!!.body.setTransform(newX, newY, 0f)
             return
         }
-        
-        for (circle in circles.asReversed()) { //TODO Might be slow, because really reverse list, TODO Cant reverse list, because then drawing is inside-out (highest circle is below all others - TODO DoubleLinkedList?
-            if (containedInCircle(screenXNormalized, screenYNormalized, circle.body.position.x, circle.body.position.y, Constants.radiusSprite)) {
-                dragCircle = circle
-                dragStartPosition = circle.body.position.copy() // Without copy will be changed whole time
-                dragStartColor = circle.getColor()
-                break
-            }
-        }
-        dragState = if (dragCircle != null) DragState.DRAGCIRCLE else DragState.DRAGNOTHING
+
+
     }
 
     //Returns True iff inX/inY Point inside circle (containemt includes border)
