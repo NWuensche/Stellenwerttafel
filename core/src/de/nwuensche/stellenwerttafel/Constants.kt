@@ -45,7 +45,7 @@ object Constants {
     val circle10Value = 10
     val circle1Value = 1
 
-    val fontSize = (density * 35).toInt() //TODO End check emulator + Mama/Alex if this wors fine on other displays as well
+    val fontSize = (density * 35).toInt()
     val scaleFont = 1f/Gdx.graphics.width - 1
 
     //delete button dimensions

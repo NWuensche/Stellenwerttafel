@@ -44,7 +44,8 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         drawDeleteButton()
         drawTexts() //Text on top of button
 
-        sR.drawCircles { circles.forEach {sR.drawCircle(it)} } // Draw 'normal' circles
+        //In refernce app, circles above everything (cover boarders, text,...)
+        sR.drawFilled { circles.forEach {sR.drawCircle(it)} } // Draw 'normal' circles
         drawAndHandleFlyingCircles()
 
     }
@@ -95,11 +96,13 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
     //TODO End refactor long methods
 
     private fun drawGrid() {
-        sR.drawLine(Vector2(Constants.firstLineBorderX, Constants.secondLineBorderY), Vector2(Constants.firstLineBorderX, Constants.height), Constants.lineWidth)
-        sR.drawLine(Vector2(Constants.secondLineBorderX, Constants.secondLineBorderY), Vector2(Constants.secondLineBorderX, Constants.height), Constants.lineWidth)
+        sR.drawFilled {
+            sR.drawLine(Vector2(Constants.firstLineBorderX, Constants.secondLineBorderY), Vector2(Constants.firstLineBorderX, Constants.height), Constants.lineWidth)
+            sR.drawLine(Vector2(Constants.secondLineBorderX, Constants.secondLineBorderY), Vector2(Constants.secondLineBorderX, Constants.height), Constants.lineWidth)
 
-        sR.drawLine(Vector2(0f, Constants.firstLineBorderY), Vector2(Constants.width, Constants.firstLineBorderY), Constants.lineWidth)
-        sR.drawLine(Vector2(0f, Constants.secondLineBorderY), Vector2(Constants.width, Constants.secondLineBorderY), Constants.lineWidth)
+            sR.drawLine(Vector2(0f, Constants.firstLineBorderY), Vector2(Constants.width, Constants.firstLineBorderY), Constants.lineWidth)
+            sR.drawLine(Vector2(0f, Constants.secondLineBorderY), Vector2(Constants.width, Constants.secondLineBorderY), Constants.lineWidth)
+        }
     }
 
 
@@ -286,7 +289,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         val screenXNormalized = screenX * Constants.convertRatio
         val screenYNormalized = screenY * Constants.convertRatio
 
-        if (dragCircle != null) { //TODO Check drag State
+        if (dragCircle != null) {
             //INFO Moving on e.g. y axis ok, even if at border of y axis, so compute both seperately
             var newX = dragCircle!!.body.position.x
             var newY = dragCircle!!.body.position.y
@@ -320,11 +323,9 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
     }
 }
 
-//TODO Inside circle shape renderer, because now also filled
+//TODO Dont forget reference iphone-app, write e-mail + Say also reference me
 fun ShapeRenderer.drawLine(v1: Vector2, v2: Vector2, width:Float) {
-    this.begin(ShapeRenderer.ShapeType.Filled)
     this.rectLine(v1, v2, width)
-    this.end()
 }
 
 fun ShapeRenderer.drawCircle(c: Fixture) {
@@ -336,7 +337,7 @@ fun ShapeRenderer.drawCircle(c: Fixture) {
 }
 
 //INFO I should only open shaperenderer once, because explensive, thus use that
-fun ShapeRenderer.drawCircles(f: () -> Unit) {
+fun ShapeRenderer.drawFilled(f: () -> Unit) {
     this.begin(ShapeRenderer.ShapeType.Filled)
     f()
     this.end()
