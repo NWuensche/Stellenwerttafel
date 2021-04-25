@@ -68,52 +68,9 @@ class MyGdxGame : ApplicationAdapter() {
                 return true
             }
         }
-
-
-
-        createBordersBox2D() // Should be after drawing all graphics, else could get out of sync
     }
 
-    //TODO Do in board, already have world
-    private fun createBordersBox2D() {
-        val borderDef = BodyDef()
-        borderDef.position.set(Vector2(0f, Constants.height))
-        val groundBody = world.createBody(borderDef)
-        val groundBox = PolygonShape()
-        groundBox.setAsBox(Constants.width, Constants.widthHitBoxBorders) //INFO Takes half values as inputs, but I want margin around drawn lines, so 'normal' is ok
-        groundBody.createFixture(groundBox, 0.0f)
 
-        borderDef.position.set(Vector2(0f, Constants.firstLineBorderY))
-        val ceilBody = world.createBody(borderDef)
-        val ceilBox = PolygonShape()
-        ceilBox.setAsBox(Constants.width, Constants.widthHitBoxBorders)
-        ceilBody.createFixture(ceilBox, 0.0f)
-
-        borderDef.position.set(Vector2(0f, 0f))
-        val leftBody = world.createBody(borderDef)
-        val leftBox = PolygonShape()
-        leftBox.setAsBox(Constants.widthHitBoxBorders, Constants.height)
-        leftBody.createFixture(leftBox, 0.0f)
-        //TODO END Schönes Logo
-
-        borderDef.position.set(Vector2(Constants.width, 0f))
-        val rightBody = world.createBody(borderDef)
-        val rightBox = PolygonShape()
-        rightBox.setAsBox(Constants.widthHitBoxBorders, Constants.height)
-        rightBody.createFixture(rightBox, 0.0f)
-
-        borderDef.position.set(Vector2(Constants.firstLineBorderX, 0f))
-        val firstLineBorderBody = world.createBody(borderDef)
-        val firstLineBorderBox = PolygonShape()
-        firstLineBorderBox.setAsBox(Constants.widthHitBoxBorders, Constants.height)
-        firstLineBorderBody.createFixture(firstLineBorderBox, 0.0f)
-
-        borderDef.position.set(Vector2(Constants.secondLineBorderX, 0f))
-        val secondLineBorderBody = world.createBody(borderDef)
-        val secondLineBorderBox = PolygonShape()
-        secondLineBorderBox.setAsBox(Constants.widthHitBoxBorders, Constants.height)
-        secondLineBorderBody.createFixture(secondLineBorderBox, 0.0f)
-    }
 
     override fun render() {
         ScreenUtils.clear(1f, 1f, 1f, 1f) //White Background
