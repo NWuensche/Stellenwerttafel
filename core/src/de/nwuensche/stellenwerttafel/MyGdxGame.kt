@@ -35,7 +35,8 @@ class MyGdxGame : ApplicationAdapter() {
     //INFO Setting doSleep=false makes movement of other circles while dragging better, and both true/false lag when 200 1-values
     //INFO Furthermore, when doSleep=false no problem with possibility of putting circle directly on boarder and keeping it there
     val world: World by lazy { World(Vector2(0f, 0f), false) } //First is gravity vector, second is CPU optimization on
-    val board: Board by lazy { Board(batch, sR, world, font) }
+    var dialogValue = -1 // How many columns should table have
+    val board: Board by lazy { Board(batch, sR, world, font, dialogValue) } //Dialogvalue will be set before board first init
     //val debugRenderer: Box2DDebugRenderer by lazy { Box2DDebugRenderer() }
 
     //INFO Always Create Font, because Bitmap.setScale() didn't worked consitently (not always same size) between devices
@@ -48,10 +49,16 @@ class MyGdxGame : ApplicationAdapter() {
         })
     }
 
+    fun dialogFinished(v: Int) {
+        dialogValue = v //Will automatically draw everything with next render
+    }
+
 
     override fun create() {
         Gdx.gl.glLineWidth(Constants.lineWidthOriginal)
 
+
+        //This does not init lazy board, so in dialog really no background
         Gdx.input.inputProcessor = object : InputAdapter() {
             override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
                 board.touchUp(screenX, screenY, pointer, button)
@@ -74,8 +81,11 @@ class MyGdxGame : ApplicationAdapter() {
 
     override fun render() {
         ScreenUtils.clear(1f, 1f, 1f, 1f) //White Background
-        board.draw()
-        doPhysicsStep(Gdx.graphics.deltaTime)
+
+        if (dialogValue != -1) {
+            board.draw()
+            doPhysicsStep(Gdx.graphics.deltaTime)
+        }
         //debugRenderer.render(world, camera.combined) //INFO Should always be done !after! drawing graphics
     }
 

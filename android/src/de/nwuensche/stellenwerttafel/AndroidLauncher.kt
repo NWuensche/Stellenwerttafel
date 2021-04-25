@@ -29,19 +29,15 @@ class AndroidLauncher : AndroidApplication() {
         //builder.setMessage("We have a message")
 //builder.setPositiveButton("OK", DialogInterface.OnClickListener(function = x))
         builder.setPositiveButton("1000") { dialog, which ->
-            Toast.makeText(applicationContext,
-                    android.R.string.yes, Toast.LENGTH_SHORT).show()
+            main.dialogFinished(4) // This would probably work when Applciation would not show behind dialog
         }
 
         builder.setNegativeButton("100") { dialog, which ->
-            Toast.makeText(applicationContext,
-                    android.R.string.no, Toast.LENGTH_SHORT).show()
+            main.dialogFinished(3) // This would probably work when Applciation would not show behind dialog
         }
 
         builder.setNeutralButton("10") { dialog, which -> // 10 has largest button, because smallest kids will use it
-            Toast.makeText(applicationContext,
-                    "Maybe", Toast.LENGTH_SHORT).show()
-            main.board.titleTable100Number = 2 // This would probably work when Applciation would not show behind dialog
+            main.dialogFinished(2) // This would probably work when Applciation would not show behind dialog
 
         }
         val density = resources.displayMetrics.density

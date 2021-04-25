@@ -13,24 +13,35 @@ import com.ibm.icu.text.MessageFormat
 import java.util.*
 import kotlin.random.Random
 
+data class Column(val leftX: Float, val rightX: Float, val value: Int, val color: Color)
 
 //batch only used for text
-class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val font: BitmapFont) : Drawable {
+class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val font: BitmapFont, numColumns: Int) : Drawable {
     val circles = arrayListOf<Fixture>()
     val flyingCircles: MutableList<FlyingCircle> = arrayListOf()
     var titleTable100Number = 0 // Updating string also updates text on screen automatically
     var titleTable10Number = 0
     var titleTable1Number = 0
     val glyph = GlyphLayout(font, "")
+    val columns: List<Column>
     val myBundle: I18NBundle by lazy {
         val baseFileHandle = Gdx.files.internal("i18n/MyBundle")
         I18NBundle.createBundle(baseFileHandle, Locale.getDefault())
     }
 
     init {
+        columns = initBorders(numColumns) //Can only init val in `init`
         //INFO Should not be problem that I do this in init when board is lazy,
         //because before I can do board.draw() in MyGdxGame, I have to init board, thus this init will get called
         createBordersBox2D() // Only do this once, so in init
+    }
+
+    fun initBorders(numColumns: Int): List<Column> {
+        val out = mutableListOf<Column>()
+        repeat(numColumns) {
+            out.add(Column(it * (Constants.width)/numColumns, (it+1) * (Constants.width)/numColumns, Constants.valuesColumns[it], Constants.colorsColumns[it]))
+        }
+        return out
     }
 
     //register box2d boxes borders once
@@ -144,11 +155,14 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
     private fun drawGrid() {
         sR.drawFilled {
-            sR.drawLine(Vector2(Constants.firstLineBorderX, Constants.secondLineBorderY), Vector2(Constants.firstLineBorderX, Constants.height), Constants.lineWidth)
-            sR.drawLine(Vector2(Constants.secondLineBorderX, Constants.secondLineBorderY), Vector2(Constants.secondLineBorderX, Constants.height), Constants.lineWidth)
-
+            //Header borders
             sR.drawLine(Vector2(0f, Constants.firstLineBorderY), Vector2(Constants.width, Constants.firstLineBorderY), Constants.lineWidth)
             sR.drawLine(Vector2(0f, Constants.secondLineBorderY), Vector2(Constants.width, Constants.secondLineBorderY), Constants.lineWidth)
+
+            //Column Borders
+            for (column in columns.dropLast(1)) {
+                sR.drawLine(Vector2(column.rightX, Constants.secondLineBorderY), Vector2(column.rightX, Constants.height), Constants.lineWidth)
+            }
         }
     }
 

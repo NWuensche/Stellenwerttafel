@@ -44,6 +44,9 @@ object Constants {
     val circle100Value = 100
     val circle10Value = 10
     val circle1Value = 1
+    val valuesColumns = listOf(1, 10, 100, 1000)
+    val colorsColumns = listOf(Color.GREEN, Color.BLUE, Color.RED, Color.YELLOW) //TODO Is yellow=100 correct?
+    //TODO Remove all unnecesary constant colors/values/coordinates
 
     val fontSize = (density * 35).toInt()
     val scaleFont = 1f/Gdx.graphics.width - 1
