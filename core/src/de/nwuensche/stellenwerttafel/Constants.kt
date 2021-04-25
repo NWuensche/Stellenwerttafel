@@ -8,21 +8,13 @@ object Constants {
     val height = Gdx.graphics.height.toFloat() / Gdx.graphics.width
     val convertRatio = 1f/Gdx.graphics.width
 
-    //2 borders for board x position
-    val firstLineBorderX = width / 3f
-    val secondLineBorderX = (2 / 3f) * width
     //2 borders for header
     val firstLineBorderY = height/4f
     val secondLineBorderY = height/8f
 
-
-
-
     val density = Gdx.graphics.density
     val lineWidthOriginal =  4 * density //Only use this to set line width for ShapeRenderer, for everything else use other lineWidth
-
     val lineWidth = lineWidthOriginal * convertRatio
-
     val ratioLineWidthBorderCircle = 0.5f
     val circleBoarderWidth = ratioLineWidthBorderCircle * lineWidth // Circles with thick boarders look bad, so reduce width
     val radiusSprite = 30f * density *  convertRatio //Radius for drawn circle, depend on density because very small when using Alex phone
@@ -38,12 +30,8 @@ object Constants {
     val lineColor = Color.BLACK
     val fontColorButton = Color.WHITE
     val overflowColor = Color.RED // Color when e.g. 11 tens or 10 ones
-    val circle100Color = Color.RED
-    val circle10Color = Color.BLUE
-    val circle1Color = Color.GREEN
-    val circle100Value = 100
-    val circle10Value = 10
-    val circle1Value = 1
+
+    val basis = 10 //Zehnersystem
     val valuesColumns = listOf(1000, 100, 10, 1)
     val colorsColumns = listOf(Color.YELLOW, Color.RED, Color.BLUE, Color.GREEN) //TODO Is yellow=100 correct?
     //TODO Remove all unnecesary constant colors/values/coordinates

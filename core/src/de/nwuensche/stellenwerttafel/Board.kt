@@ -135,7 +135,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         font.color = Constants.lineColor
 
         for ((i, column) in columns.withIndex()) {
-            font.color = if (titleTableNumbers[i] >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
+            font.color = if (titleTableNumbers[i] >= Constants.basis) Constants.overflowColor else Constants.lineColor
             font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValue${column.value}", titleTableNumbers[i]), column.leftX, column.rightX, Constants.secondLineBorderY, Constants.firstLineBorderY)
         }
 
