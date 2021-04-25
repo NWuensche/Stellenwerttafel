@@ -18,21 +18,18 @@ object Constants {
 
 
 
-    //TODO Relative to width? Check with emulator + Other smartphones like Alex
-    //TODO radius 2x basierend auf density
     val density = Gdx.graphics.density
     val lineWidthOriginal =  4 * density //Only use this to set line width for ShapeRenderer, for everything else use other lineWidth
 
     val lineWidth = lineWidthOriginal * convertRatio
-    val circleBoarderWidth = lineWidth/2
 
-
-    val radiusSprite = 50f * convertRatio //Radius for drawn circle
-    val radiusHitBox = 20f * convertRatio //Radius for box2d box circle, has to be smaller because otherwise 100 1-circles wobble too much
+    val ratioLineWidthBorderCircle = 0.5f
+    val circleBoarderWidth = ratioLineWidthBorderCircle * lineWidth // Circles with thick boarders look bad, so reduce width
+    val radiusSprite = 30f * density *  convertRatio //Radius for drawn circle, depend on density because very small when using Alex phone
+    val radiusHitBox = 12f * density * convertRatio //Radius for box2d box circle, has to be smaller because otherwise 100 1-circles wobble too much
     val marginCircle = radiusSprite - radiusHitBox
-    val ratioLineWidth = 0.5
-    val widthHitBoxBorders = marginCircle + (ratioLineWidth * lineWidth).toFloat() //Need margin so that circle + border dont overlap because circle spriteradius != hitbox radius + used to not drag circle out of screen
-    val widthCircleAndHitbox = radiusSprite + (ratioLineWidth * lineWidth).toFloat()
+    val widthHitBoxBorders = marginCircle + (ratioLineWidthBorderCircle * lineWidth).toFloat() //Need margin so that circle + border dont overlap because circle spriteradius != hitbox radius + used to not drag circle out of screen
+    val widthCircleAndHitbox = radiusSprite + (ratioLineWidthBorderCircle * lineWidth).toFloat()
 
     val timeStep = 1/60f
     val speedFactor = 2 //Move circle in 1/x seconds
