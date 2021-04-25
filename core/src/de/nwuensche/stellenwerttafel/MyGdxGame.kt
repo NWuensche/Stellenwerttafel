@@ -53,10 +53,8 @@ class MyGdxGame : ApplicationAdapter() {
         Gdx.gl.glLineWidth(Constants.lineWidthOriginal)
 
         Gdx.input.inputProcessor = object : InputAdapter() {
-            //TODO Remove circle when moved top Alex geht das nur wenn beschleunigt nach oben kommen, oder auch wenn ganz langsam?
             override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-                board.touchUp(screenX, screenY, pointer, button) //TODO Alex ist das touchUp oder touchDown?
-                //TODO Alex Touch Drag auf nichts erstellt am Ende auch Button oder nicht? oder vielleicht sogar am Anfang?
+                board.touchUp(screenX, screenY, pointer, button)
                 return true
             }
 
@@ -66,7 +64,7 @@ class MyGdxGame : ApplicationAdapter() {
             }
 
             override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-                board.touchDragged(screenX, screenY, pointer) //TODO Alex ist das touchUp oder touchDown?
+                board.touchDragged(screenX, screenY, pointer)
                 return true
             }
         }

@@ -221,7 +221,8 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         }
 
         updateTableCounters()
-        //TODO Alex Dialogbox für Anzahl Spalten jedes Mal bei Start?
+        //TODO Alex Dialogbox für Anzahl Spalten jedes Mal bei Start? Damit Internatioal: NUM +/-, und dann drunter Liste erweitern welche Basen drin (1,10,100,...) + oder einfach direkt LARGESTBAST +/- in eine Zeile
+        //TODO Cap bei 1000, da ich sonst extra translatation einfügen müsste (also erlaube nur als LARGEST_BASE 10,100,1000 (auch nicht 1 erlauben, das ist kompliziert)
     }
 
     //Remove all box2d boxes from circles, make circles fly in random directions
@@ -268,7 +269,6 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
             (x1 >= Constants.secondLineBorderX) && (x1 <= Constants.secondLineBorderX + Constants.widthCircleAndHitbox) -> Constants.secondLineBorderX + Constants.widthCircleAndHitbox //In second hitbox, but closer to 1-box
             else -> x1 // No border-collision detected
         }
-        //TODO Alex was passiert mit Circlen wenn die über Header landen/liegen? gehen die da überhaupt hin mit drag? Oder werden die direkt gelöscht
         val y2 = y1 //INFO Dont need border thing like for x2 for y2, because coerceIn handles custom border (+  not bottom, there physically not possible)
         circleDef.position.set(x2, y2)
         //TODO End auch Englische Beschreibung + Englischen Namen in Google Play Store
