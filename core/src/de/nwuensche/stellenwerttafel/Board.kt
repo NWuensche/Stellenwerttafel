@@ -13,15 +13,14 @@ import com.ibm.icu.text.MessageFormat
 import java.util.*
 import kotlin.random.Random
 
-data class Column(val leftX: Float, val rightX: Float, val value: Int, val color: Color)
+//TODO LATER Drop `circles` list, do everything with extra attribute `listCirclesInColumn` and iterate over them (because .size is const time, while .filter is not
+data class Column(val leftX: Float, val rightX: Float, val color: Color, val value: Int)
 
 //batch only used for text
 class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val font: BitmapFont, numColumns: Int) : Drawable {
     val circles = arrayListOf<Fixture>()
     val flyingCircles: MutableList<FlyingCircle> = arrayListOf()
-    var titleTable100Number = 0 // Updating string also updates text on screen automatically
-    var titleTable10Number = 0
-    var titleTable1Number = 0
+    val titleTableNumbers: MutableList<Int>// Updating string also updates text on screen automatically
     val glyph = GlyphLayout(font, "")
     val columns: List<Column>
     val myBundle: I18NBundle by lazy {
@@ -31,6 +30,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
     init {
         columns = initBorders(numColumns) //Can only init val in `init`
+        titleTableNumbers = MutableList(numColumns) {0}
         //INFO Should not be problem that I do this in init when board is lazy,
         //because before I can do board.draw() in MyGdxGame, I have to init board, thus this init will get called
         createBordersBox2D() // Only do this once, so in init
@@ -40,7 +40,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         val out = mutableListOf<Column>()
         val offset = Constants.valuesColumns.size - numColumns // e.g. when only 3 columns, then ignore first 1000-column
         repeat(numColumns) {
-            out.add(Column(it * (Constants.width)/numColumns, (it+1) * (Constants.width)/numColumns, Constants.valuesColumns[it+offset], Constants.colorsColumns[it+offset]))
+            out.add(Column(it * (Constants.width)/numColumns, (it+1) * (Constants.width)/numColumns, Constants.colorsColumns[it+offset], Constants.valuesColumns[it+offset]))
         }
         return out
     }
@@ -126,18 +126,17 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
     private fun drawTexts() {
         batch.begin()
         //TODO Update sum also consider tens or thousands
-        val sum = Constants.circle100Value * titleTable100Number + Constants.circle10Value * titleTable10Number + Constants.circle1Value * titleTable1Number
+        val sum = titleTableNumbers.mapIndexed { i,it -> columns[i].value * it }.sum()
         val sumLocalizedText = MessageFormat.format("{0,spellout}", sum).replace(" ", "").replace("\u00AD", "").replace("-", "").capitalize() //replace '-' and unicode-version of '-' because zweihundert is actually 'zwei-hundert', same holds for ' ' in english
         font.drawCentered(batch, this.glyph, "$sum = $sumLocalizedText", 0f, Constants.width, 0f, Constants.secondLineBorderY) //INFO Does not look good when xRight=ButtonX
-        font.color = if (titleTable100Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
 
         font.color = Constants.fontColorButton
         font.drawCentered(batch, this.glyph, "\u00D7", Constants.buttonX, Constants.buttonX + Constants.buttonWidth, Constants.buttonY, Constants.buttonY+Constants.buttonHeight)
         font.color = Constants.lineColor
 
-        for (column in columns) {
-            font.color = if (titleTable100Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
-            font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValue${column.value}", titleTable100Number), column.leftX, column.rightX, Constants.secondLineBorderY, Constants.firstLineBorderY)
+        for ((i, column) in columns.withIndex()) {
+            font.color = if (titleTableNumbers[i] >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
+            font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValue${column.value}", titleTableNumbers[i]), column.leftX, column.rightX, Constants.secondLineBorderY, Constants.firstLineBorderY)
         }
 
         font.color = Constants.lineColor
@@ -202,7 +201,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
                 }
             } else { //Moved Circle inside tables, update everything
                 val oldValue = dragCircle!!.getValue()
-                dragCircle!!.updateColor()
+                dragCircle!!.updateColor(columns)
                 val newValue = dragCircle!!.getValue()
 
                 val ratio = oldValue.toFloat() / newValue
@@ -240,12 +239,10 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
     private fun updateTableCounters() {
         //TODO Could be faster by traversing only once
-        titleTable100Number = circles.filter { it.getColor() == Constants.circle100Color }.size +
-                flyingCircles.filter { it.keep && it.color == Constants.circle100Color }.size
-        titleTable10Number = circles.filter { it.getColor() == Constants.circle10Color }.size +
-                flyingCircles.filter { it.keep && it.color == Constants.circle10Color }.size
-        titleTable1Number = circles.filter { it.getColor() == Constants.circle1Color }.size +
-                flyingCircles.filter { it.keep && it.color == Constants.circle1Color }.size
+        for ((i, column) in columns.withIndex()) {
+            titleTableNumbers[i] = circles.filter { it.getColor() == column.color }.size +
+                    flyingCircles.filter { it.keep && it.color == column.color }.size
+        }
     }
 
     fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int) {
@@ -330,7 +327,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         // INFO without this, creating many circles next to each other does not make them move until I pull first by hand
         body.applyLinearImpulse(Vector2(0.0001f, 0.0001f), body.position, true) //Impulse applies once, Force continiously
         val fixture = body.createFixture(fixtureDef)
-        fixture.updateColor()
+        fixture.updateColor(columns)
         circles.add(fixture)
         return fixture
     }
@@ -428,12 +425,13 @@ fun ShapeRenderer.drawRoundedRect(x: Float, y: Float, width: Float, height: Floa
 
 //Return right color, depending on x-coordinate
 //Dont do this all the time because circle should keep color while dragging
-fun Fixture.updateColor() {
+fun Fixture.updateColor(columns: List<Column>) {
     val x = this.body.position.x
-    this.body.userData = when {
-        x >= Constants.secondLineBorderX -> Pair(Constants.circle1Color, Constants.circle1Value)
-        x >= Constants.firstLineBorderX -> Pair(Constants.circle10Color, Constants.circle10Value)
-        else -> Pair(Constants.circle100Color, Constants.circle100Value)
+    for (column in columns) {
+        if (column.rightX >= x) { //Works because of ordering of columns
+            this.body.userData = Pair(column.color, column.value)
+            return
+        }
     }
 }
 
