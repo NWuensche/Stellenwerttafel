@@ -38,8 +38,9 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
     fun initBorders(numColumns: Int): List<Column> {
         val out = mutableListOf<Column>()
+        val offset = Constants.valuesColumns.size - numColumns // e.g. when only 3 columns, then ignore first 1000-column
         repeat(numColumns) {
-            out.add(Column(it * (Constants.width)/numColumns, (it+1) * (Constants.width)/numColumns, Constants.valuesColumns[it], Constants.colorsColumns[it]))
+            out.add(Column(it * (Constants.width)/numColumns, (it+1) * (Constants.width)/numColumns, Constants.valuesColumns[it+offset], Constants.colorsColumns[it+offset]))
         }
         return out
     }
@@ -125,20 +126,20 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
     private fun drawTexts() {
         batch.begin()
-
+        //TODO Update sum also consider tens or thousands
         val sum = Constants.circle100Value * titleTable100Number + Constants.circle10Value * titleTable10Number + Constants.circle1Value * titleTable1Number
         val sumLocalizedText = MessageFormat.format("{0,spellout}", sum).replace(" ", "").replace("\u00AD", "").replace("-", "").capitalize() //replace '-' and unicode-version of '-' because zweihundert is actually 'zwei-hundert', same holds for ' ' in english
         font.drawCentered(batch, this.glyph, "$sum = $sumLocalizedText", 0f, Constants.width, 0f, Constants.secondLineBorderY) //INFO Does not look good when xRight=ButtonX
         font.color = if (titleTable100Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
 
-        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueHundreds", titleTable100Number), 0f, Constants.firstLineBorderX, Constants.secondLineBorderY, Constants.firstLineBorderY)
-        font.color = if (titleTable10Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
-        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueTens", titleTable10Number), Constants.firstLineBorderX, Constants.secondLineBorderX, Constants.secondLineBorderY, Constants.firstLineBorderY)
-        font.color = if (titleTable1Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
-        font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValueOnes", titleTable1Number), Constants.secondLineBorderX, Constants.width, Constants.secondLineBorderY, Constants.firstLineBorderY)
-
         font.color = Constants.fontColorButton
         font.drawCentered(batch, this.glyph, "\u00D7", Constants.buttonX, Constants.buttonX + Constants.buttonWidth, Constants.buttonY, Constants.buttonY+Constants.buttonHeight)
+        font.color = Constants.lineColor
+
+        for (column in columns) {
+            font.color = if (titleTable100Number >= Constants.circle10Value) Constants.overflowColor else Constants.lineColor
+            font.drawCentered(batch, this.glyph, myBundle.format("namePlaceValue${column.value}", titleTable100Number), column.leftX, column.rightX, Constants.secondLineBorderY, Constants.firstLineBorderY)
+        }
 
         font.color = Constants.lineColor
         batch.end()
