@@ -72,17 +72,14 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         rightBox.setAsBox(Constants.widthHitBoxBorders, Constants.height)
         rightBody.createFixture(rightBox, 0.0f)
 
-        borderDef.position.set(Vector2(Constants.firstLineBorderX, 0f))
-        val firstLineBorderBody = world.createBody(borderDef)
-        val firstLineBorderBox = PolygonShape()
-        firstLineBorderBox.setAsBox(Constants.widthHitBoxBorders, Constants.height)
-        firstLineBorderBody.createFixture(firstLineBorderBox, 0.0f)
-
-        borderDef.position.set(Vector2(Constants.secondLineBorderX, 0f))
-        val secondLineBorderBody = world.createBody(borderDef)
-        val secondLineBorderBox = PolygonShape()
-        secondLineBorderBox.setAsBox(Constants.widthHitBoxBorders, Constants.height)
-        secondLineBorderBody.createFixture(secondLineBorderBox, 0.0f)
+        //Column borders
+        for (column in columns.dropLast(1)) {
+            borderDef.position.set(Vector2(column.rightX, 0f))
+            val borderBody = world.createBody(borderDef)
+            val borderBox = PolygonShape()
+            borderBox.setAsBox(Constants.widthHitBoxBorders, Constants.height)
+            borderBody.createFixture(borderBox, 0.0f)
+        }
     }
 
     private enum class DragState {
