@@ -13,7 +13,7 @@ import com.ibm.icu.text.MessageFormat
 import java.util.*
 import kotlin.random.Random
 
-//TODO LATER Drop `circles` list, do everything with extra attribute `listCirclesInColumn` and iterate over them (because .size is const time, while .filter is not
+//Dont do, because then finding `highest` circle for dragging and flying very hard - LATER Drop `circles` list, do everything with extra attribute `listCirclesInColumn` and iterate over them (because .size is const time, while .filter is not
 data class Column(val leftX: Float, val rightX: Float, val color: Color, val value: Int)
 
 //batch only used for text
@@ -65,7 +65,6 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         val leftBox = PolygonShape()
         leftBox.setAsBox(Constants.widthHitBoxBorders, Constants.height)
         leftBody.createFixture(leftBox, 0.0f)
-        //TODO END Schönes Logo
 
         borderDef.position.set(Vector2(Constants.width, 0f))
         val rightBody = world.createBody(borderDef)
@@ -125,7 +124,6 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
     private fun drawTexts() {
         batch.begin()
-        //TODO Update sum also consider tens or thousands
         val sum = titleTableNumbers.mapIndexed { i,it -> columns[i].value * it }.sum()
         val sumLocalizedText = MessageFormat.format("{0,spellout}", sum).replace(" ", "").replace("\u00AD", "").replace("-", "").capitalize() //replace '-' and unicode-version of '-' because zweihundert is actually 'zwei-hundert', same holds for ' ' in english
         font.drawCentered(batch, this.glyph, "$sum = $sumLocalizedText", 0f, Constants.width, 0f, Constants.secondLineBorderY) //INFO Does not look good when xRight=ButtonX
@@ -279,8 +277,6 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         }
 
         updateTableCounters()
-        //TODO Alex Dialogbox für Anzahl Spalten jedes Mal bei Start? Damit Internatioal: NUM +/-, und dann drunter Liste erweitern welche Basen drin (1,10,100,...) + oder einfach direkt LARGESTBAST +/- in eine Zeile
-        //TODO Cap bei 1000, da ich sonst extra translatation einfügen müsste (also erlaube nur als LARGEST_BASE 10,100,1000 (auch nicht 1 erlauben, das ist kompliziert)
     }
 
     //Remove all box2d boxes from circles, make circles fly in random directions

@@ -33,8 +33,7 @@ object Constants {
 
     val basis = 10 //Zehnersystem
     val valuesColumns = listOf(1000, 100, 10, 1)
-    val colorsColumns = listOf(Color.YELLOW, Color.RED, Color.BLUE, Color.GREEN) //TODO Is yellow=100 correct?
-    //TODO Remove all unnecesary constant colors/values/coordinates
+    val colorsColumns = listOf(Color.YELLOW, Color.RED, Color.BLUE, Color.GREEN) //TODO Is yellow=1000 correct?
 
     val fontSize = (density * 35).toInt()
     val scaleFont = 1f/Gdx.graphics.width - 1
