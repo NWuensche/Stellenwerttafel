@@ -115,33 +115,48 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         val screenXNormalized = screenX * Constants.convertRatio
         val screenYNormalized = screenY * Constants.convertRatio
 
+        //INFO Cannot use this, because when I re-tap screen while circle is flying, it does not get counted because now another touchUp event -> Also count flying circles which I keep
+        // If I fly circle from header back to start place
+        // Then the value of the circle is not counted while it is flying
+        // To prevent this, I store its value in outOfScopeFlyingValue variable
+        // and add it to correct table column when necessary
+        //var outOfScopeFlyingValue = -1
+
+
+
         if (dragState != DragState.DRAGCIRCLE) { // As long as not moved circle, create new one
             createNewCircle(screenXNormalized, screenYNormalized, completelyNewSingleCircle = true)
         } else {
-            //Moved Circle, update everything
-            val oldValue = dragCircle!!.getValue()
-            dragCircle!!.updateColor()
-            val newValue = dragCircle!!.getValue()
+            //Moved Circle out of table into header, either fly back or delete
+            if(dragCircle!!.body.position.y <= Constants.firstLineBorderY) { // Below second line -> fly back
+                flyingCircles.add(FlyingCircle(dragCircle!!.body.position.copy(), dragStartPosition!!, dragStartColor!!, sR, keep = true))
+                circles.remove(dragCircle!!)
+                dragCircle?.destroy()
+            }  else { //Moved Circle inside tables, update everything
+                val oldValue = dragCircle!!.getValue()
+                dragCircle!!.updateColor()
+                val newValue = dragCircle!!.getValue()
 
-            val ratio = oldValue.toFloat()/newValue
-            if (ratio >= 1) { // Add circles or do nothing
-                repeat(ratio.toInt() - 1) { //Keep original dragged circle, so only create one less, Without keeping dragged circle, new circles wont move, so keep it
-                    createNewCircle(screenXNormalized, screenYNormalized)
-                }
-            } else { //Remove circles
-                //Again, keep original dragged circle
-                val numCirclesToRemove = (1/ratio).toInt() - 1 //keep dragged one, so -1
-                val circlesToRemove = circles.getCirclesOfValue(numCirclesToRemove, oldValue)
-                //INFO Don't want that moving circle collides with anything, so remove its fixture/body first
-                if (circlesToRemove == null) {
-                    flyingCircles.add(FlyingCircle(dragCircle!!.body.position, dragStartPosition!!, dragStartColor!!, sR, keep = true))
-                    circles.remove(dragCircle!!)
-                    dragCircle!!.destroy()
-                }
-                circlesToRemove?.forEach {
-                    flyingCircles.add(FlyingCircle(it.body.position, Vector2(screenXNormalized, screenYNormalized), it.getColor(), sR))
-                    circles.remove(it)
-                    it.destroy() //INFO Needed, else still lag although moved circles from 1 to 100
+                val ratio = oldValue.toFloat() / newValue
+                if (ratio >= 1) { // Add circles or do nothing
+                    repeat(ratio.toInt() - 1) { //Keep original dragged circle, so only create one less, Without keeping dragged circle, new circles wont move, so keep it
+                        createNewCircle(screenXNormalized, screenYNormalized)
+                    }
+                } else { //Remove circles
+                    //Again, keep original dragged circle
+                    val numCirclesToRemove = (1 / ratio).toInt() - 1 //keep dragged one, so -1
+                    val circlesToRemove = circles.getCirclesOfValue(numCirclesToRemove, oldValue)
+                    //INFO Don't want that moving circle collides with anything, so remove its fixture/body first
+                    if (circlesToRemove == null) {
+                        flyingCircles.add(FlyingCircle(dragCircle!!.body.position.copy(), dragStartPosition!!, dragStartColor!!, sR, keep = true))
+                        circles.remove(dragCircle!!)
+                        dragCircle!!.destroy()
+                    }
+                    circlesToRemove?.forEach {
+                        flyingCircles.add(FlyingCircle(it.body.position.copy(), Vector2(screenXNormalized, screenYNormalized), it.getColor(), sR))
+                        circles.remove(it)
+                        it.destroy() //INFO Needed, else still lag although moved circles from 1 to 100
+                    }
                 }
             }
         }
@@ -152,11 +167,17 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         dragStartPosition = null
         dragStartColor = null
 
-        //update counter
+        updateTableCounters()
+    }
+
+    private fun updateTableCounters() {
         //TODO Could be faster by traversing only once
-        titleTable100Number = circles.filter{it.getColor() == Constants.circle100Color}.size
-        titleTable10Number = circles.filter{it.getColor() == Constants.circle10Color}.size
-        titleTable1Number = circles.filter{it.getColor() == Constants.circle1Color}.size
+        titleTable100Number = circles.filter { it.getColor() == Constants.circle100Color }.size +
+                flyingCircles.filter { it.keep && it.color == Constants.circle100Color }.size
+        titleTable10Number = circles.filter { it.getColor() == Constants.circle10Color }.size +
+                flyingCircles.filter { it.keep && it.color == Constants.circle10Color }.size
+        titleTable1Number = circles.filter { it.getColor() == Constants.circle1Color }.size +
+                flyingCircles.filter { it.keep && it.color == Constants.circle1Color }.size
     }
 
     fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int) {
@@ -170,11 +191,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
         //Dont need to handle touchUp when pressing button, because I ignore touchUp in header
 
-        //update counter
-        //TODO Could be faster by traversing only once
-        titleTable100Number = circles.filter{it.getColor() == Constants.circle100Color}.size
-        titleTable10Number = circles.filter{it.getColor() == Constants.circle10Color}.size
-        titleTable1Number = circles.filter{it.getColor() == Constants.circle1Color}.size
+        updateTableCounters()
     }
 
     //Remove all box2d boxes from circles, make circles fly in random directions
@@ -245,7 +262,10 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
             if((screenXNormalized- Constants.widthCircleAndHitbox >= 0) && (screenXNormalized + Constants.widthCircleAndHitbox <= Constants.width)){
                 newX = screenXNormalized
             }
-            if((screenYNormalized- Constants.widthCircleAndHitbox >= Constants.firstLineBorderY) && (screenYNormalized + Constants.widthCircleAndHitbox <= Constants.height)){
+
+            //Ok to go out of screen at top, because then circle will be deleted
+            //if((screenYNormalized- Constants.widthCircleAndHitbox >= Constants.firstLineBorderY) && (screenYNormalized + Constants.widthCircleAndHitbox <= Constants.height)){
+            if(screenYNormalized + Constants.widthCircleAndHitbox <= Constants.height){
                 newY = screenYNormalized
             }
             dragCircle!!.body.setTransform(newX, newY, 0f)
