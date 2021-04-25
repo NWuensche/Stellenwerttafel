@@ -103,7 +103,6 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         //In refernce app, circles above everything (cover boarders, text,...)
         sR.drawFilled { circles.forEach {sR.drawCircle(it)} } // Draw 'normal' circles
         drawAndHandleFlyingCircles()
-
     }
 
     //draw flying circles (without box2d box) + remove them when they are at goal and shall be removed
@@ -322,15 +321,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         //If I dont check this, then it can happen that when moving 100-circle fast to right/up/down border of 1-value that some circles are generated out of screen (can be seen when going back to 100)
         val x1 = x.coerceIn(Constants.widthCircleAndHitbox, Constants.width - Constants.widthCircleAndHitbox)
         val y1 = y.coerceIn(Constants.firstLineBorderY + Constants.widthCircleAndHitbox, Constants.height - Constants.widthCircleAndHitbox)
-        //Also check not inside hitbox of border, else it can happen that e.g. when putting 100-circle on border (to 10-circle) of 1-circle then some circles left and some right, but all green
-        val x2 = when {
-            (x1 >= Constants.firstLineBorderX - Constants.widthCircleAndHitbox) && (x1 <= Constants.firstLineBorderX) -> Constants.firstLineBorderX - Constants.widthCircleAndHitbox //In first hitbox, but closer to 100-box
-            (x1 >= Constants.firstLineBorderX) && (x1 <= Constants.firstLineBorderX + Constants.widthCircleAndHitbox) -> Constants.firstLineBorderX + Constants.widthCircleAndHitbox //In first hitbox, but closer to 10-box
-
-            (x1 >= Constants.secondLineBorderX - Constants.widthCircleAndHitbox) && (x1 <= Constants.secondLineBorderX) -> Constants.secondLineBorderX - Constants.widthCircleAndHitbox //In second hitbox, but closer to 10-box
-            (x1 >= Constants.secondLineBorderX) && (x1 <= Constants.secondLineBorderX + Constants.widthCircleAndHitbox) -> Constants.secondLineBorderX + Constants.widthCircleAndHitbox //In second hitbox, but closer to 1-box
-            else -> x1 // No border-collision detected
-        }
+        val x2 = handleXInBorder(x1)
         val y2 = y1 //INFO Dont need border thing like for x2 for y2, because coerceIn handles custom border (+  not bottom, there physically not possible)
         circleDef.position.set(x2, y2)
         //TODO End auch Englische Beschreibung + Englischen Namen in Google Play Store
@@ -342,6 +333,19 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         fixture.updateColor()
         circles.add(fixture)
         return fixture
+    }
+
+    //Also check not inside hitbox of border, else it can happen that e.g. when putting 100-circle on border (to 10-circle) of 1-circle then some circles left and some right, but all green
+    fun handleXInBorder(x: Float): Float {
+        for (column in columns.dropLast(1)) {
+            if ((x >= column.rightX - Constants.widthCircleAndHitbox) && (x <= column.rightX)) {//In border hitbox, but closer to left side
+                return column.rightX - Constants.widthCircleAndHitbox
+            }
+            if ((x >= column.rightX) && (x <= column.rightX + Constants.widthCircleAndHitbox)) {//In border hitbox, but closer to right side
+                return column.rightX + Constants.widthCircleAndHitbox
+            }
+        }
+        return x //In no hitbox, so can draw as is
     }
 
     fun touchDragged(screenX: Int, screenY: Int, pointer: Int) {
