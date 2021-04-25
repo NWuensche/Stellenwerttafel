@@ -13,6 +13,7 @@ import com.ibm.icu.text.MessageFormat
 import java.util.*
 import kotlin.random.Random
 
+//TODO Wenn >40 Downloads: Replace Circle ShapeRenderer with SpriteBatch, can make image out of ShapreRenderer with PixMap or already have circle generator for Jewel Trop -
 //Dont do, because then finding `highest` circle for dragging and flying very hard - LATER Drop `circles` list, do everything with extra attribute `listCirclesInColumn` and iterate over them (because .size is const time, while .filter is not
 data class Column(val leftX: Float, val rightX: Float, val color: Color, val value: Int)
 
@@ -92,7 +93,6 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
     var dragStartPosition: Vector2? = null
     var dragCircle: Fixture? = null
     var dragStartColor: Color? = null // Will for jump back circles be overwritten, so store it first
-    //TODO END also name app English when uploading english version
 
     override fun draw() {
         drawGrid()
@@ -317,7 +317,6 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         val x2 = handleXInBorder(x1)
         val y2 = y1 //INFO Dont need border thing like for x2 for y2, because coerceIn handles custom border (+  not bottom, there physically not possible)
         circleDef.position.set(x2, y2)
-        //TODO End auch Englische Beschreibung + Englischen Namen in Google Play Store
 
         val body = world.createBody(circleDef)
         // INFO without this, creating many circles next to each other does not make them move until I pull first by hand
@@ -379,7 +378,6 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
     }
 }
 
-//TODO Dont forget reference iphone-app, write e-mail + Say also reference me
 fun ShapeRenderer.drawLine(v1: Vector2, v2: Vector2, width:Float) {
     this.rectLine(v1, v2, width)
 }
