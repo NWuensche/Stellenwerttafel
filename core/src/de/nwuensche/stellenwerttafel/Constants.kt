@@ -21,9 +21,11 @@ object Constants {
     //TODO Relative to width? Check with emulator + Other smartphones like Alex
     //TODO radius 2x basierend auf density
     val density = Gdx.graphics.density
-    val lineWidthOriginal = 10f //Only use this to set line width for ShapeRenderer, for everything else use other lineWidth
+    val lineWidthOriginal =  4 * density //Only use this to set line width for ShapeRenderer, for everything else use other lineWidth
 
-    val lineWidth = 10f * convertRatio
+    val lineWidth = lineWidthOriginal * convertRatio
+    val circleBoarderWidth = lineWidth/2
+
 
     val radiusSprite = 50f * convertRatio //Radius for drawn circle
     val radiusHitBox = 20f * convertRatio //Radius for box2d box circle, has to be smaller because otherwise 100 1-circles wobble too much

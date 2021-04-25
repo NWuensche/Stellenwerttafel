@@ -95,11 +95,11 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
     //TODO End refactor long methods
 
     private fun drawGrid() {
-        sR.drawLine(Vector2(Constants.firstLineBorderX, Constants.secondLineBorderY), Vector2(Constants.firstLineBorderX, Constants.height))
-        sR.drawLine(Vector2(Constants.secondLineBorderX, Constants.secondLineBorderY), Vector2(Constants.secondLineBorderX, Constants.height))
+        sR.drawLine(Vector2(Constants.firstLineBorderX, Constants.secondLineBorderY), Vector2(Constants.firstLineBorderX, Constants.height), Constants.lineWidth)
+        sR.drawLine(Vector2(Constants.secondLineBorderX, Constants.secondLineBorderY), Vector2(Constants.secondLineBorderX, Constants.height), Constants.lineWidth)
 
-        sR.drawLine(Vector2(0f, Constants.firstLineBorderY), Vector2(Constants.width, Constants.firstLineBorderY))
-        sR.drawLine(Vector2(0f, Constants.secondLineBorderY), Vector2(Constants.width, Constants.secondLineBorderY))
+        sR.drawLine(Vector2(0f, Constants.firstLineBorderY), Vector2(Constants.width, Constants.firstLineBorderY), Constants.lineWidth)
+        sR.drawLine(Vector2(0f, Constants.secondLineBorderY), Vector2(Constants.width, Constants.secondLineBorderY), Constants.lineWidth)
     }
 
 
@@ -320,9 +320,10 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
     }
 }
 
-fun ShapeRenderer.drawLine(v1: Vector2, v2: Vector2) {
-    this.begin(ShapeRenderer.ShapeType.Line)
-    this.line(v1, v2)
+//TODO Inside circle shape renderer, because now also filled
+fun ShapeRenderer.drawLine(v1: Vector2, v2: Vector2, width:Float) {
+    this.begin(ShapeRenderer.ShapeType.Filled)
+    this.rectLine(v1, v2, width)
     this.end()
 }
 
@@ -330,7 +331,7 @@ fun ShapeRenderer.drawCircle(c: Fixture) {
     val pos = c.body.position
     this.circle(pos.x, pos.y, Constants.radiusSprite, 50) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
     this.color = c.getColor()
-    this.circle(pos.x, pos.y, Constants.radiusSprite - (Constants.lineWidth * 0.5).toFloat(), 20) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
+    this.circle(pos.x, pos.y, Constants.radiusSprite - Constants.circleBoarderWidth, 20) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
     this.color = Constants.lineColor
 }
 
