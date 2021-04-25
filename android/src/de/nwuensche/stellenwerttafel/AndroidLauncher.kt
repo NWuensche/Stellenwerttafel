@@ -20,6 +20,8 @@ class AndroidLauncher : AndroidApplication() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val config = AndroidApplicationConfiguration()
+        val main = MyGdxGame()
+
 
         val builder = MaterialAlertDialogBuilder(this)
         builder.setCancelable(false) //Cant press next to dialog to skip it
@@ -39,6 +41,8 @@ class AndroidLauncher : AndroidApplication() {
         builder.setNeutralButton("10") { dialog, which -> // 10 has largest button, because smallest kids will use it
             Toast.makeText(applicationContext,
                     "Maybe", Toast.LENGTH_SHORT).show()
+            main.board.titleTable100Number = 2 // This would probably work when Applciation would not show behind dialog
+
         }
         val density = resources.displayMetrics.density
         val dialog = builder.create()
@@ -61,6 +65,6 @@ class AndroidLauncher : AndroidApplication() {
         //Should !really! adjust after show
         dialog.window?.setLayout((8*fontSize*density).roundToInt(), (3*fontSize*density).roundToInt()); //Controlling width and height.
 
-        initialize(MyGdxGame(), config)
+        initialize(main, config)
     }
 }
