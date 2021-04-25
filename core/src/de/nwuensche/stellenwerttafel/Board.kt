@@ -128,11 +128,19 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
             createNewCircle(screenXNormalized, screenYNormalized, completelyNewSingleCircle = true)
         } else {
             //Moved Circle out of table into header, either fly back or delete
-            if(dragCircle!!.body.position.y <= Constants.firstLineBorderY) { // Below second line -> fly back
-                flyingCircles.add(FlyingCircle(dragCircle!!.body.position.copy(), dragStartPosition!!, dragStartColor!!, sR, keep = true))
-                circles.remove(dragCircle!!)
-                dragCircle?.destroy()
-            }  else { //Moved Circle inside tables, update everything
+            if (dragCircle!!.body.position.y <= Constants.firstLineBorderY) { // Above first line -> In Header
+                if (dragCircle!!.body.position.y >= Constants.secondLineBorderY) { // Above first line and below second line -> fly back
+                    flyingCircles.add(FlyingCircle(dragCircle!!.body.position.copy(), dragStartPosition!!, dragStartColor!!, sR, keep = true))
+                    circles.remove(dragCircle!!)
+                    dragCircle?.destroy()
+                } else { // Above first line and above second line -> remove and fly to upper boarder screen
+                    val newX = dragCircle!!.body.position.x
+                    val newY = -Constants.offset //Fly through upper boarder screen
+                    flyingCircles.add(FlyingCircle(dragCircle!!.body.position.copy(), Vector2(newX, newY), dragStartColor!!, sR))
+                    circles.remove(dragCircle!!)
+                    dragCircle?.destroy()
+                }
+            } else { //Moved Circle inside tables, update everything
                 val oldValue = dragCircle!!.getValue()
                 dragCircle!!.updateColor()
                 val newValue = dragCircle!!.getValue()
@@ -192,6 +200,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         //Dont need to handle touchUp when pressing button, because I ignore touchUp in header
 
         updateTableCounters()
+        //TODO Alex Dialogbox für Anzahl Spalten jedes Mal bei Start?
     }
 
     //Remove all box2d boxes from circles, make circles fly in random directions
@@ -199,15 +208,14 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         for (circle in circles) {
             //random which border the circle flyies to, Other value is random
             val whichOneIsBorder = Random.Default.nextInt(4) //4 non-inclusive
-            val offset = 0.1f //Add to coordinates so that flying circle already offscreen when it gets destroyed
             val endX = when(whichOneIsBorder) {
-                0 -> -offset
-                1 -> Constants.width + offset
+                0 -> -Constants.offset
+                1 -> Constants.width + Constants.offset
                 else -> Random.Default.nextFloat() * Constants.width //Normalize
             }
             val endY = when(whichOneIsBorder) {
-                2 -> -offset
-                3 -> Constants.height + offset
+                2 -> -Constants.offset
+                3 -> Constants.height + Constants.offset
                 else -> Random.Default.nextFloat() * Constants.height //Normalize
             }
             //copy position vector, because else would also be destroyed

@@ -34,6 +34,7 @@ object Constants {
 
     val timeStep = 1/60f
     val speedFactor = 2 //Move circle in 1/x seconds
+    val offset = 0.1f //Add to coordinates when removing circle so that flying circle already offscreen when it gets destroyed
 
     val lineColor = Color.BLACK
     val fontColorButton = Color.WHITE
