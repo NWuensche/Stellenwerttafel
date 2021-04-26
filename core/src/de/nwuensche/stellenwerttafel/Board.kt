@@ -464,6 +464,7 @@ fun List<Fixture>.getCirclesOfValue(num: Int, value: Int): List<Fixture>? {//Ret
     if (num == 0) return emptyList() // Do this for easier if-else stuff after for-loop
 
     val out = arrayListOf<Fixture>()
+    //TODO Can I create once reversed list with asReversed, and use this all the time (kotlin documentation
     for (circle in this.asReversed()) { //TODO Might be slow, because really reverse list
         if (circle.getValue() == value) {
             out.add(circle)
