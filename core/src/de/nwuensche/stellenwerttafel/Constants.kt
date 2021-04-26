@@ -29,11 +29,14 @@ object Constants {
 
     val lineColor = Color.BLACK
     val fontColorButton = Color.WHITE
-    val overflowColor = Color.RED // Color when e.g. 11 tens or 10 ones
 
     val basis = 10 //Zehnersystem
     val valuesColumns = listOf(1000, 100, 10, 1)
-    val colorsColumns = listOf(Color.YELLOW, Color.RED, Color.BLUE, Color.GREEN) //TODO Is yellow=1000 correct?
+    val mattGreen = Color.valueOf("009245")
+    val mattBlue = Color.valueOf("0072bf")
+    val mattRed = Color.valueOf("fe0001")
+    val colorsColumns = listOf(mattGreen, mattRed, mattBlue, mattGreen) //INFO iPad 1000 is green
+    val overflowColor = mattRed // Color when e.g. 11 tens or 10 ones
 
     val fontSize = (density * 35).toInt()
     val scaleFont = 1f/Gdx.graphics.width - 1 //INFO Will be adjusted to fidplay again in init of Board
