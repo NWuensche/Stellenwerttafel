@@ -36,7 +36,7 @@ object Constants {
     val colorsColumns = listOf(Color.YELLOW, Color.RED, Color.BLUE, Color.GREEN) //TODO Is yellow=1000 correct?
 
     val fontSize = (density * 35).toInt()
-    val scaleFont = 1f/Gdx.graphics.width - 1
+    val scaleFont = 1f/Gdx.graphics.width - 1 //INFO Will be adjusted to fidplay again in init of Board
 
     //delete button dimensions
     val buttonX = 0.9f * width

@@ -35,6 +35,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         //INFO Should not be problem that I do this in init when board is lazy,
         //because before I can do board.draw() in MyGdxGame, I have to init board, thus this init will get called
         createBordersBox2D() // Only do this once, so in init
+        setFontRightSize()
     }
 
     fun initBorders(numColumns: Int): List<Column> {
@@ -81,6 +82,26 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
             borderBox.setAsBox(Constants.widthHitBoxBorders, Constants.height)
             borderBody.createFixture(borderBox, 0.0f)
         }
+    }
+
+    //Set Text s.t. it fits well in box
+    fun setFontRightSize() {
+        //Create longest possible text in header, assume that this is largest number in whole app (e.g. 1000) + largest place value (e.g. Thousands) in current Table
+        val longestNumInHeader = Constants.valuesColumns[0] // get value of largest possible column (here 1000)
+        val longestText = myBundle.format("namePlaceValue${columns[0].value}", longestNumInHeader)
+
+        glyph.setText(font, longestText)
+
+        val textWidth = glyph.width
+        val possibleWidth = (columns[0].rightX - 0.5f*Constants.lineWidth)
+        val scaleTextWidth = (1 + Constants.scaleFont) * (possibleWidth/textWidth) //for setscale has to be e.g. 0.1 instead of -0.9
+
+        val textHeight = glyph.height
+        val possibleHeight = Constants.firstLineBorderY - (Constants.secondLineBorderY + Constants.lineWidth)
+        val scaleTextHeight = (1 + Constants.scaleFont) * (possibleHeight/textHeight) //for setscale has to be e.g. 0.1 instead of -0.9
+
+        //Take minimum of scale width/height so it doesnt go over any line, but also consider Constants.scaleFont because dont want to upscale (e.g. when using `10` as largest column)
+        font.data.setScale(listOf(scaleTextWidth, scaleTextHeight, 1+Constants.scaleFont).min()!!) // INFO data.scale is wrong, but for setscale has to be e.g. 0.1 instead of -0.9
     }
 
     private enum class DragState {
