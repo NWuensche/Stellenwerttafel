@@ -14,6 +14,8 @@ import java.util.*
 import kotlin.random.Random
 
 //TODO Wenn >40 Downloads: Replace Circle ShapeRenderer with SpriteBatch, can make image out of ShapreRenderer with PixMap or already have circle generator for Jewel Trop -
+//TODO Use for this https://gamedev.stackexchange.com/questions/49671/shaperenderer-efficiency-on-games
+//TODO And https://www.reddit.com/r/libgdx/comments/6k5u5o/using_shaperenderer_effectively/
 //Dont do, because then finding `highest` circle for dragging and flying very hard - LATER Drop `circles` list, do everything with extra attribute `listCirclesInColumn` and iterate over them (because .size is const time, while .filter is not
 data class Column(val leftX: Float, val rightX: Float, val color: Color, val value: Int)
 
