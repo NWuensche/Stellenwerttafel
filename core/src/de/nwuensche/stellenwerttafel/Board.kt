@@ -30,7 +30,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         val baseFileHandle = Gdx.files.internal("i18n/MyBundle")
         I18NBundle.createBundle(baseFileHandle, Locale.getDefault())
     }
-    val plateDrawer: PlateDrawer by lazy {ShapeRendererPlateDrawer(sR)}
+    val pD: PlateDrawer by lazy {ShapeRendererPlateDrawer(sR)}
 
     init {
         columns = initBorders(numColumns) //Can only init val in `init`
@@ -124,7 +124,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         drawTexts() //Text on top of button
 
         //In refernce app, circles above everything (cover boarders, text,...)
-        sR.drawFilled { circles.forEach {plateDrawer.drawPlate(it)} } // Draw 'normal' circles
+        sR.drawFilled { circles.forEach {pD.drawPlate(it)} } // Draw 'normal' circles
         drawAndHandleFlyingCircles()
     }
 
@@ -213,13 +213,13 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
             if (dragCircle!!.body.position.y <= Constants.firstLineBorderY) { // Above first line -> In Header
                 if (dragCircle!!.body.position.y >= Constants.secondLineBorderY) { // Above first line and below second line -> fly back
-                    flyingCircles.add(FlyingCircle(dragCircle!!.body.position.copy(), dragStartPosition!!, dragStartColor!!, sR, keep = true))
+                    flyingCircles.add(FlyingCircle(dragCircle!!.body.position.copy(), dragStartPosition!!, dragStartColor!!, pD, keep = true))
                     circles.remove(dragCircle!!)
                     dragCircle?.destroy()
                 } else { // Above first line and above second line -> remove and fly to upper boarder screen
                     val newX = dragCircle!!.body.position.x
                     val newY = -Constants.offset //Fly through upper boarder screen
-                    flyingCircles.add(FlyingCircle(dragCircle!!.body.position.copy(), Vector2(newX, newY), dragStartColor!!, sR))
+                    flyingCircles.add(FlyingCircle(dragCircle!!.body.position.copy(), Vector2(newX, newY), dragStartColor!!, pD))
                     circles.remove(dragCircle!!)
                     dragCircle?.destroy()
                 }
@@ -239,12 +239,12 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
                     val circlesToRemove = circles.getCirclesOfValue(numCirclesToRemove, oldValue)
                     //INFO Don't want that moving circle collides with anything, so remove its fixture/body first
                     if (circlesToRemove == null) {
-                        flyingCircles.add(FlyingCircle(dragCircle!!.body.position.copy(), dragStartPosition!!, dragStartColor!!, sR, keep = true))
+                        flyingCircles.add(FlyingCircle(dragCircle!!.body.position.copy(), dragStartPosition!!, dragStartColor!!, pD, keep = true))
                         circles.remove(dragCircle!!)
                         dragCircle!!.destroy()
                     }
                     circlesToRemove?.forEach {
-                        flyingCircles.add(FlyingCircle(it.body.position.copy(), Vector2(screenXNormalized, screenYNormalized), it.getColor(), sR))
+                        flyingCircles.add(FlyingCircle(it.body.position.copy(), Vector2(screenXNormalized, screenYNormalized), it.getColor(), pD))
                         circles.remove(it)
                         it.destroy() //INFO Needed, else still lag although moved circles from 1 to 100
                     }
@@ -321,7 +321,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
                 else -> Random.Default.nextFloat() * Constants.height //Normalize
             }
             //copy position vector, because else would also be destroyed
-            flyingCircles.add(FlyingCircle(circle.body.position.copy(), Vector2(endX, endY), circle.getColor(), sR))
+            flyingCircles.add(FlyingCircle(circle.body.position.copy(), Vector2(endX, endY), circle.getColor(), pD))
             circle.destroy()
         }
         circles.clear() // Last, because cant remove while iterating over list

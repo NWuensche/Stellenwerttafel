@@ -7,19 +7,13 @@ import com.badlogic.gdx.math.Vector2
 import kotlin.math.sign
 
 //keep = true if after movement circle should still be their (used when circle jumps back)
-class FlyingCircle(var currentPosition: Vector2, val endPosition: Vector2, val color: Color, val sR: ShapeRenderer, val keep: Boolean = false) : Drawable {
+class FlyingCircle(var currentPosition: Vector2, val endPosition: Vector2, val color: Color, val pD: PlateDrawer, val keep: Boolean = false) : Drawable {
     private val completeDistance: Vector2 = endPosition.copy().sub(currentPosition)
     private val startAngleSign = endPosition.angle(currentPosition).sign.toInt()
     var atEnd = false
     override fun draw() {
         updatePosition()
-
-        sR.run {
-            this.circle(currentPosition.x,currentPosition.y,Constants.radiusSprite,100) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
-            this.color = this@FlyingCircle.color
-            this.circle(currentPosition.x,currentPosition.y,Constants.radiusSprite - (Constants.lineWidth * 0.5).toFloat(), 100) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
-            this.color = Constants.lineColor
-        }
+        pD.drawPlate(currentPosition, color)
     }
 
     //returns true iff circle at end destination
