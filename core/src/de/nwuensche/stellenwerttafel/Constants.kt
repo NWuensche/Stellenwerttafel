@@ -2,6 +2,7 @@ package de.nwuensche.stellenwerttafel
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
 
 object Constants {
     val width = 1f // INFO Box2D wants small camera value (not pixels x pixels, but 1 x normalzied), then movements is also fast
@@ -47,4 +48,10 @@ object Constants {
     val buttonWidth = width - (buttonX + lineWidth)
     val buttonHeight = secondLineBorderY - 2.5f*lineWidth //INFO .5 because of linewidth of secondLineBorderY, so that margin top and bottom of button are same height
     val buttonCornerRadius = 0.005f
+
+    enum class PlateTextures(val texture: Texture) {
+        GREEN(Texture("plates/circleGREEN")),
+        BLUE(Texture("plates/circleBLUE")),
+        RED(Texture("plates/circleRED")),
+    }
 }

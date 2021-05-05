@@ -3,7 +3,6 @@ package de.nwuensche.stellenwerttafel
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.Fixture
 
 class ShapeRendererPlateDrawer(val sR: ShapeRenderer) : PlateDrawer {
     override fun drawPlate(pos: Vector2, c: Color) {
