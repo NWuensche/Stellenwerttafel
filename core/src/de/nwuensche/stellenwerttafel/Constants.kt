@@ -16,7 +16,7 @@ object Constants {
     val lineWidthOriginal =  4 * density //Only use this to set line width for ShapeRenderer, for everything else use other lineWidth
     val lineWidth = lineWidthOriginal * convertRatio
     val ratioLineWidthBorderCircle = 0.5f
-    val circleBoarderWidth = ratioLineWidthBorderCircle * lineWidth // Circles with thick boarders look bad, so reduce width
+    val circleBoarderWidth = ratioLineWidthBorderCircle * lineWidth //INFO Only used when ShapreRendererPlateDrawer used, not for SpriteBatchPlateDrawer// Circles with thick boarders look bad, so reduce width
     val radiusSprite = 30f * density *  convertRatio //Radius for drawn circle, depend on density because very small when using Alex phone
     val radiusHitBox = 12f * density * convertRatio //Radius for box2d box circle, has to be smaller because otherwise 100 1-circles wobble too much
     val marginCircle = radiusSprite - radiusHitBox
