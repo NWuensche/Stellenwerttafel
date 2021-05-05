@@ -30,6 +30,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         val baseFileHandle = Gdx.files.internal("i18n/MyBundle")
         I18NBundle.createBundle(baseFileHandle, Locale.getDefault())
     }
+    val plateDrawer: PlateDrawer by lazy {ShapeRendererPlateDrawer(sR)}
 
     init {
         columns = initBorders(numColumns) //Can only init val in `init`
@@ -123,7 +124,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         drawTexts() //Text on top of button
 
         //In refernce app, circles above everything (cover boarders, text,...)
-        sR.drawFilled { circles.forEach {sR.drawCircle(it)} } // Draw 'normal' circles
+        sR.drawFilled { circles.forEach {plateDrawer.drawPlate(it)} } // Draw 'normal' circles
         drawAndHandleFlyingCircles()
     }
 
@@ -403,14 +404,6 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
 
 fun ShapeRenderer.drawLine(v1: Vector2, v2: Vector2, width:Float) {
     this.rectLine(v1, v2, width)
-}
-
-fun ShapeRenderer.drawCircle(c: Fixture) {
-    val pos = c.body.position
-    this.circle(pos.x, pos.y, Constants.radiusSprite, 50) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
-    this.color = c.getColor()
-    this.circle(pos.x, pos.y, Constants.radiusSprite - Constants.circleBoarderWidth, 20) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
-    this.color = Constants.lineColor
 }
 
 //INFO I should only open shaperenderer once, because explensive, thus use that
