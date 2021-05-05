@@ -131,12 +131,14 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
     //draw flying circles (without box2d box) + remove them when they are at goal and shall be removed
     private fun drawAndHandleFlyingCircles() {
         val flyingCirclesToDelete = arrayListOf<FlyingCircle>() //Store all circles which are at endposition, because I cant remove while iterating over collection, is forbidden
+        sR.begin(ShapeRenderer.ShapeType.Filled)
         flyingCircles.forEach {
             val atEnd = it.drawAndFinished()
             if (atEnd) {
                 flyingCirclesToDelete.add(it)
             }
         }
+        sR.end()
         //INFO Dont clear all flying circles once one is at goal, could do two seperate movements at once
         flyingCirclesToDelete.forEach {
             if (it.keep) { //Create new circle with physics (used when jump back circle)
