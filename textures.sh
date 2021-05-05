@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #Sprite width/height
-SSIZE="90"
+SSIZE="512" #Looks better around the edges than 90px
 
 BACKCOLOR_T="white"
 BACKCOLOR_JEWELHOLE="transparent"
@@ -9,8 +9,8 @@ BORDERCOLOR_JEWEL="#000000"
 
 #Line Color for Border of T
 LCOLOR="#000000"
-#Width of a line of the T
-LWIDTH_T="3"
+#Width of line around jewel/hole
+LWIDTH_JEWEL=30
 
 # Margin between Jewel Border and Border Line of T
 MARGIN=10
@@ -24,8 +24,6 @@ function sprites {
   OUTJEWEL="android/assets/plates"
   mkdir -p $OUTJEWEL
 
-  #Width of line around jewel/hole
-  LWIDTH_JEWEL=5
 
   HOLECOLOR="#000000"
   #Command to generate hole that only depends later on the draw shape

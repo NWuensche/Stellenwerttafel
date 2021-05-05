@@ -9,6 +9,14 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
 
 class SpriteBatchPlateDrawer(val sB: SpriteBatch) : PlateDrawer {
+    override fun begin() {
+        sB.begin()
+    }
+
+    override fun end() {
+        sB.end()
+    }
+
     override fun drawPlate(pos: Vector2, c: Color) {
         //TODO Store them in custom object so to not recreate sprite all the time
         val texture = when {
@@ -20,7 +28,7 @@ class SpriteBatchPlateDrawer(val sB: SpriteBatch) : PlateDrawer {
         val s = Sprite(texture).apply {
             x = pos.x
             y = pos.y
-            setSize(0.05f,0.05f) //TODO Density Based look Jewel
+            setSize(Constants.radiusSprite,Constants.radiusSprite) //TODO Density Based look Jewel
         }
         s.draw(sB)
     }

@@ -50,8 +50,8 @@ object Constants {
     val buttonCornerRadius = 0.005f
 
     enum class PlateTextures(val texture: Texture) {
-        GREEN(Texture("plates/circleGREEN")),
-        BLUE(Texture("plates/circleBLUE")),
-        RED(Texture("plates/circleRED")),
+        GREEN(Texture("plates/circleGREEN.png")),
+        BLUE(Texture("plates/circleBLUE.png")),
+        RED(Texture("plates/circleRED.png")),
     }
 }

@@ -30,7 +30,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         val baseFileHandle = Gdx.files.internal("i18n/MyBundle")
         I18NBundle.createBundle(baseFileHandle, Locale.getDefault())
     }
-    val pD: PlateDrawer by lazy {ShapeRendererPlateDrawer(sR)}
+    val pD: PlateDrawer by lazy {SpriteBatchPlateDrawer(batch)}
 
     init {
         columns = initBorders(numColumns) //Can only init val in `init`
@@ -124,21 +124,23 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         drawTexts() //Text on top of button
 
         //In refernce app, circles above everything (cover boarders, text,...)
-        sR.drawFilled { circles.forEach {pD.drawPlate(it)} } // Draw 'normal' circles
+        pD.begin()
+        circles.forEach { pD.drawPlate(it) } // Draw 'normal' circles
+        pD.end()
         drawAndHandleFlyingCircles()
     }
 
     //draw flying circles (without box2d box) + remove them when they are at goal and shall be removed
     private fun drawAndHandleFlyingCircles() {
         val flyingCirclesToDelete = arrayListOf<FlyingCircle>() //Store all circles which are at endposition, because I cant remove while iterating over collection, is forbidden
-        sR.begin(ShapeRenderer.ShapeType.Filled)
+        pD.begin()
         flyingCircles.forEach {
             val atEnd = it.drawAndFinished()
             if (atEnd) {
                 flyingCirclesToDelete.add(it)
             }
         }
-        sR.end()
+        pD.end()
         //INFO Dont clear all flying circles once one is at goal, could do two seperate movements at once
         flyingCirclesToDelete.forEach {
             if (it.keep) { //Create new circle with physics (used when jump back circle)

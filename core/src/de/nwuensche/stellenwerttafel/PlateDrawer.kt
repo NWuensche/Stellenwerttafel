@@ -14,6 +14,9 @@ interface PlateDrawer {
         drawCircle(v.x, v.y)
     }*/
 
+    fun begin()
+    fun end()
+
     fun drawPlate(v: Vector2, color: Color)
 
     fun drawPlate(f: Fixture) {

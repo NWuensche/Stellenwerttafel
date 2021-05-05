@@ -5,6 +5,14 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 
 class ShapeRendererPlateDrawer(val sR: ShapeRenderer) : PlateDrawer {
+    override fun begin() {
+        sR.begin(ShapeRenderer.ShapeType.Filled)
+    }
+
+    override fun end() {
+        sR.end()
+    }
+
     override fun drawPlate(pos: Vector2, c: Color) {
         sR.run {
             this.circle(pos.x, pos.y, Constants.radiusSprite, 50) //INFO With Segments, circle border much smoother + For me only way to get them actually drawn when using Box2D, otherwise invisible or completely strange forms
