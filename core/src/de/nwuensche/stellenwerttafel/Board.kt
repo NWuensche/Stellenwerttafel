@@ -4,13 +4,16 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
+import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 import com.badlogic.gdx.utils.I18NBundle
 import com.ibm.icu.text.MessageFormat
+import java.lang.IllegalArgumentException
 import java.util.*
+import kotlin.concurrent.thread
 import kotlin.random.Random
 
 //TODO Wenn >40 Downloads: Replace Circle ShapeRenderer with SpriteBatch, can make image out of ShapreRenderer with PixMap or already have circle generator for Jewel Trop -
@@ -30,7 +33,7 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
         val baseFileHandle = Gdx.files.internal("i18n/MyBundle")
         I18NBundle.createBundle(baseFileHandle, Locale.getDefault())
     }
-    val pD: PlateDrawer by lazy {SpriteBatchPlateDrawer(batch)}
+    val pD: PlateDrawer by lazy {ShapeRendererPlateDrawer(sR)} //INFO For using SpriteBatch for Circles, only change init in here
 
     init {
         columns = initBorders(numColumns) //Can only init val in `init`
@@ -443,18 +446,19 @@ fun Fixture.updateColor(columns: List<Column>) {
     val x = this.body.position.x
     for (column in columns) {
         if (column.rightX >= x) { //Works because of ordering of columns
-            this.body.userData = Pair(column.color, column.value)
+            //INFO Use Map so that I can add Sprite if I currently work with SpriteBatchPlateDrawer
+            this.body.userData = mutableMapOf(Pair("Color", column.color), Pair("Value", column.value))
             return
         }
     }
 }
 
 fun Fixture.getColor(): Color {
-    return (this.body.userData as Pair<Color, Int>).first
+    return (this.body.userData as Map<String, Any>)["Color"] as Color
 }
 
 fun Fixture.getValue(): Int {
-    return (this.body.userData as Pair<Color, Int>).second
+    return (this.body.userData as Map<String, Any>)["Value"] as Int
 }
 
 fun Fixture.destroy() = this.body.destroyFixture(this)
