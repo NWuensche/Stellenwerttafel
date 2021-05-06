@@ -19,7 +19,5 @@ interface PlateDrawer {
 
     fun drawPlate(v: Vector2, color: Color)
 
-    fun drawPlate(f: Fixture) {
-        drawPlate(f.body.position, f.getColor())
-    }
+    fun drawPlate(f: Fixture)
 }
