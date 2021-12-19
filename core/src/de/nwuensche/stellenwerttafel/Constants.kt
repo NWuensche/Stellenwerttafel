@@ -33,10 +33,11 @@ object Constants {
 
     val basis = 10 //Zehnersystem
     val valuesColumns = listOf(1000, 100, 10, 1)
-    val mattGreen = Color.valueOf("009245")
+    val mattGreen1 = Color.valueOf("009245")
+    val mattGreen1000 = Color.valueOf("009246")
     val mattBlue = Color.valueOf("0072bf")
     val mattRed = Color.valueOf("fe0001")
-    val colorsColumns = listOf(mattGreen, mattRed, mattBlue, mattGreen) //INFO iPad 1000 is green
+    val colorsColumns = listOf(mattGreen1000, mattRed, mattBlue, mattGreen1) //INFO iPad 1000 is green
     val overflowColor = mattRed // Color when e.g. 11 tens or 10 ones
 
     val fontSize = (density * 35).toInt()

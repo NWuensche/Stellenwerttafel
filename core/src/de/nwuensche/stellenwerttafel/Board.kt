@@ -266,6 +266,8 @@ class Board(val batch: SpriteBatch, val sR: ShapeRenderer, val world: World, val
     private fun updateTableCounters() {
         //TODO Could be faster by traversing only once
         for ((i, column) in columns.withIndex()) {
+            //TODO Here is a bug because one + thousend "should" have same color, but then adding 1000 also always adds one (and vice versa)
+                // Thus, use for thousand a slightly different color internally, but still same texture
             titleTableNumbers[i] = circles.filter { it.getColor() == column.color }.size +
                     flyingCircles.filter { it.keep && it.color == column.color }.size
         }

@@ -25,7 +25,7 @@ class SpriteBatchPlateDrawer(private val sB: SpriteBatch) : PlateDrawer {
     //TODO This is directly called for flying circles, but this is slow (creating new sprite). Fix this (only needed when using SpriteBatchPlateDrawer, not when using ShapeRendererPlateDrawer)
     override fun drawPlate(pos: Vector2, c: Color) {
         val texture = when (c) {
-            Constants.mattGreen -> Constants.PlateTextures.GREEN.texture
+            Constants.mattGreen1000, Constants.mattGreen1 -> Constants.PlateTextures.GREEN.texture
             Constants.mattBlue -> Constants.PlateTextures.BLUE.texture
             Constants.mattRed -> Constants.PlateTextures.RED.texture
             else -> throw IllegalArgumentException(c.toString())
@@ -44,7 +44,7 @@ class SpriteBatchPlateDrawer(private val sB: SpriteBatch) : PlateDrawer {
         if (!m.containsKey("Sprite")) {
             //TODO Store them in custom object so to not recreate sprite all the time
             val texture = when (this.getColor()) {
-                Constants.mattGreen -> Constants.PlateTextures.GREEN.texture
+                Constants.mattGreen1000, Constants.mattGreen1 -> Constants.PlateTextures.GREEN.texture
                 Constants.mattBlue -> Constants.PlateTextures.BLUE.texture
                 Constants.mattRed -> Constants.PlateTextures.RED.texture
                 else -> throw IllegalArgumentException(this.getColor().toString())
