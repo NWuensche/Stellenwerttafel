@@ -1,6 +1,6 @@
 android {
-    buildToolsVersion "33.0.0"
-    compileSdkVersion 33
+    buildToolsVersion "34.0.0"
+    compileSdkVersion 34
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -19,9 +19,9 @@ android {
     defaultConfig {
         applicationId "de.nwuensche.stellenwerttafel"
         minSdkVersion 21 //Below Lollipop I have problems with too many functions for one dex
-        targetSdkVersion 33
-        versionCode 7
-        versionName "1.4"
+        targetSdkVersion 34
+        versionCode 8
+        versionName "1.5"
     }
     buildTypes {
         release {
