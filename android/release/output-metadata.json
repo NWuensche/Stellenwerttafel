@@ -4,15 +4,15 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "de.nwuensche.stellenwerttafel",
+  "applicationId": "de.nwuensche.stellenwerttafel2",
   "variantName": "release",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 9,
-      "versionName": "2.0",
+      "versionCode": 10,
+      "versionName": "2.1",
       "outputFile": "android-release.apk"
     }
   ],
