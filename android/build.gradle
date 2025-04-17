@@ -20,8 +20,8 @@ android {
         applicationId "de.nwuensche.stellenwerttafel2"
         minSdkVersion 21 //Below Lollipop I have problems with too many functions for one dex
         targetSdkVersion 35
-        versionCode 9
-        versionName "2.0"
+        versionCode 10
+        versionName "2.1"
     }
     
     namespace "de.nwuensche.stellenwerttafel"
