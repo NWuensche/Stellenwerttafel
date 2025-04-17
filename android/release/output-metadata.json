@@ -11,10 +11,11 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 8,
-      "versionName": "1.5",
+      "versionCode": 9,
+      "versionName": "2.0",
       "outputFile": "android-release.apk"
     }
   ],
-  "elementType": "File"
+  "elementType": "File",
+  "minSdkVersionForDexing": 21
 }
