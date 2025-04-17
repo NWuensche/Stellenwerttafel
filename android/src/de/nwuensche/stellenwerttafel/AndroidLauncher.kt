@@ -1,5 +1,6 @@
 package de.nwuensche.stellenwerttafel
 
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.widget.Button
@@ -9,6 +10,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
 class AndroidLauncher : AndroidApplication() {
+    private val PREFS_NAME = "StellenwerttafelPrefs"
+    private val BACKGROUND_OPEN_COUNT_KEY = "backgroundOpenCount"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val config = AndroidApplicationConfiguration()
@@ -17,6 +20,39 @@ class AndroidLauncher : AndroidApplication() {
         createAndShowNumColumnsDialog(main)
 
         initialize(main, config)
+    }
+    
+    override fun onResume() {
+        super.onResume()
+        checkAndShowBackgroundDialog()
+    }
+    
+    private fun checkAndShowBackgroundDialog() {
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        var count = prefs.getInt(BACKGROUND_OPEN_COUNT_KEY, 0)
+        
+        // Increment the counter
+        count++
+        
+        // Save the updated counter
+        prefs.edit().putInt(BACKGROUND_OPEN_COUNT_KEY, count).apply()
+        
+        // Show dialog every third time
+        if (count % 3 == 0) {
+            showBackgroundDialog()
+        }
+    }
+    
+    private fun showBackgroundDialog() {
+        runOnUiThread {
+            val builder = MaterialAlertDialogBuilder(this)
+            builder.setCancelable(false)
+            builder.setMessage("test123")
+            builder.setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+            }
+            builder.create().show()
+        }
     }
 
     private fun createAndShowNumColumnsDialog(main: MyGdxGame) {
