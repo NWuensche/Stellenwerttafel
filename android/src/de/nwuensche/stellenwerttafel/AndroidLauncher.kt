@@ -7,6 +7,8 @@ import android.widget.Button
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class AndroidLauncher : AndroidApplication() {
@@ -28,6 +30,18 @@ class AndroidLauncher : AndroidApplication() {
     }
     
     private fun checkAndShowBackgroundDialog() {
+        // Check if current date is on or after May 10, 2025
+        val currentDate = Calendar.getInstance()
+        val targetDate = Calendar.getInstance().apply {
+            set(2025, Calendar.MAY, 10, 0, 0, 0) // Month is 0-based in Calendar
+            set(Calendar.MILLISECOND, 0)
+        }
+        
+        // Only proceed if we're on or after the target date
+        if (currentDate.timeInMillis < targetDate.timeInMillis) {
+            return
+        }
+        
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         var count = prefs.getInt(BACKGROUND_OPEN_COUNT_KEY, 0)
         
