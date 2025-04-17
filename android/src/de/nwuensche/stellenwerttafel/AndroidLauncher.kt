@@ -30,7 +30,7 @@ class AndroidLauncher : AndroidApplication() {
         super.onResume()
     }
 
-    
+
 
     private fun createAndShowNumColumnsDialog(main: MyGdxGame) {
         val builder = MaterialAlertDialogBuilder(this) //Keep this instead of AlertDialog.Builder, because AlertDialog.Builder does not have Material Design and looks ugly

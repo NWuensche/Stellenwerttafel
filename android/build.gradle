@@ -17,7 +17,7 @@ android {
         exclude 'META-INF/robovm/ios/robovm.xml'
     }
     defaultConfig {
-        applicationId "de.nwuensche.stellenwerttafel"
+        applicationId "de.nwuensche.stellenwerttafel2"
         minSdkVersion 21 //Below Lollipop I have problems with too many functions for one dex
         targetSdkVersion 35
         versionCode 9
