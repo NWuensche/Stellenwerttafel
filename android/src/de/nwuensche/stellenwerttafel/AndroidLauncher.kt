@@ -2,6 +2,8 @@ package de.nwuensche.stellenwerttafel
 
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import com.badlogic.gdx.backends.android.AndroidApplication
@@ -61,11 +63,33 @@ class AndroidLauncher : AndroidApplication() {
         runOnUiThread {
             val builder = MaterialAlertDialogBuilder(this)
             builder.setCancelable(false)
-            builder.setMessage("test123")
+            builder.setMessage("Diese App kann leider ab dem 15.05.2025 nicht mehr aktualisiert werden. Lade dir stattdessen die (gleiche) kostenlose Stellenwerttafel aus dem Google Play Store")
             builder.setPositiveButton("OK") { dialog, _ ->
                 dialog.dismiss()
             }
+            builder.setNeutralButton("Zur neuen App") { dialog, _ ->
+                openPlayStoreLink()
+                dialog.dismiss()
+            }
             builder.create().show()
+        }
+    }
+    
+    private fun openPlayStoreLink() {
+        val playStoreUri = Uri.parse("https://play.google.com/store/apps/developer?id=Niklas++Wünsche")
+        
+        // Try to open in Play Store app first
+        val playStoreIntent = Intent(Intent.ACTION_VIEW, playStoreUri).apply {
+            setPackage("com.android.vending") // Play Store package name
+        }
+        
+        // Check if Play Store app is available
+        if (playStoreIntent.resolveActivity(packageManager) != null) {
+            startActivity(playStoreIntent)
+        } else {
+            // Fall back to browser if Play Store app is not available
+            val browserIntent = Intent(Intent.ACTION_VIEW, playStoreUri)
+            startActivity(browserIntent)
         }
     }
 
