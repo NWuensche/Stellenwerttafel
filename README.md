@@ -4,7 +4,7 @@ An app to learn the decimal place value chart inspired by the corresponding [iOS
 
 Built with the framework [libgdx](https://libgdx.com/) and Kotlin.
 
-![Place.mov](Place.mov)
+[![Place.webm](Place.webm)](Place.webm)
 
 # Set up
 
