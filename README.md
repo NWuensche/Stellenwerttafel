@@ -4,7 +4,9 @@ An app to learn the decimal place value chart inspired by the corresponding [iOS
 
 Built with the framework [libgdx](https://libgdx.com/) and Kotlin.
 
-[![Place.webm](Place.webm)](Place.webm)
+There is also a corresponding [blog post about this app](https://flyingbytes.github.io/programming/android/functional/kotlin/libgdx/admob/2020/03/22/LibGDX-Kotlin-Admob.html)
+
+https://github.com/NWuensche/Stellenwerttafel/raw/refs/heads/master/Place.webm
 
 # Set up
 
