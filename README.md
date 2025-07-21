@@ -6,7 +6,7 @@ Built with the framework [libgdx](https://libgdx.com/) and Kotlin.
 
 There is also a corresponding [blog post about this app](https://flyingbytes.github.io/programming/android/functional/kotlin/libgdx/admob/2020/03/22/LibGDX-Kotlin-Admob.html)
 
-https://github.com/NWuensche/Stellenwerttafel/raw/refs/heads/master/Place.webm
+https://github.com/NWuensche/Stellenwerttafel/raw/refs/heads/master/Place.mov
 
 # Set up
 
