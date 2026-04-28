@@ -1,5 +1,5 @@
 android {
-    buildToolsVersion "35.0.0"
+    buildToolsVersion "36.0.0"
     compileSdkVersion 36
     sourceSets {
         main {
@@ -25,7 +25,7 @@ android {
         applicationId "de.nwuensche.stellenwerttafel3"
         minSdkVersion 21 //Below Lollipop I have problems with too many functions for one dex
         targetSdkVersion 36
-        versionCode 11
+        versionCode 12
         versionName "2.1"
     }
 
