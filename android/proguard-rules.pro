@@ -35,6 +35,8 @@
    boolean contactFilter(long, long);
    void    beginContact(long);
    void    endContact(long);
+   boolean getUseDefaultContactFilter();
+   void    setUseDefaultContactFilter(boolean);
    void    preSolve(long, long);
    void    postSolve(long, long);
    boolean reportFixture(long);

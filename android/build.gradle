@@ -25,8 +25,8 @@ android {
         applicationId "de.nwuensche.stellenwerttafel3"
         minSdkVersion 21 //Below Lollipop I have problems with too many functions for one dex
         targetSdkVersion 36
-        versionCode 12
-        versionName "2.1"
+        versionCode 13
+        versionName "2.2"
     }
 
     compileOptions {
